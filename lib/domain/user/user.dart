@@ -5,14 +5,14 @@ class User with EquatableMixin {
   final String tokenId;
   final DateTime creationDate;
   final double balance;
-  final bool paired;
+  final String? username;
 
   User({
     required this.uuid,
     required this.tokenId,
     required this.creationDate,
     required this.balance,
-    required this.paired,
+    this.username,
   });
 
   User.empty() : this(
@@ -20,9 +20,8 @@ class User with EquatableMixin {
     tokenId: "",
     creationDate: DateTime.fromMillisecondsSinceEpoch(0),
     balance: 0,
-    paired: false,
   );
 
   @override
-  List<Object?> get props => [uuid, tokenId, creationDate, balance, paired];
+  List<Object?> get props => [uuid, tokenId, creationDate, balance, username];
 }

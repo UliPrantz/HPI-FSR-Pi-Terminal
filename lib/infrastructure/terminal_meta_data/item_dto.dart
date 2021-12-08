@@ -6,9 +6,13 @@ part 'item_dto.g.dart';
 
 @JsonSerializable()
 class ItemDto {
-  final String name;
-  final int price;
+  @JsonKey(name: 'id')
   final String uuid;
+  
+  @JsonKey(name: 'friendly_name')
+  final String name;
+
+  final int price;
 
   ItemDto({required this.name, required this.price, required this.uuid});
 

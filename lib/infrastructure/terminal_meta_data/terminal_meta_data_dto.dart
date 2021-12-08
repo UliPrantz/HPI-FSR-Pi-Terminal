@@ -7,11 +7,18 @@ import 'package:terminal_frontend/domain/terminal_meta_data/terminal_meta_data.d
 
 part 'terminal_meta_data_dto.g.dart';
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class TerminalMetaDataDto {
+  @JsonKey(name: 'id')
   final String uuid;
+
+  @JsonKey(name: 'friendly_name')
   final String name;
+
+  @JsonKey(name: 'permission')
   final String permission;
+
+  @JsonKey(name: 'products')
   final List<ItemDto> itemDtos;
 
   TerminalMetaDataDto({

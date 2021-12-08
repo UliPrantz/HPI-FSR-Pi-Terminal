@@ -7,7 +7,7 @@ import 'package:terminal_frontend/infrastructure/core/http_client/http_client.da
 import 'package:terminal_frontend/infrastructure/terminal_meta_data/terminal_meta_data_dto.dart';
 
 class TerminalMetaDataService extends TerminalMetaDataServiceInterface {
-  static const String endpoint = "/pos/terminal";
+  static const String endpoint = "/pos/terminal"; //GET
 
   final CachedHttpClient httpClient;
 
