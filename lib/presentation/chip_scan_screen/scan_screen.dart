@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:terminal_frontend/presentation/core/app_bar.dart';
 import 'package:terminal_frontend/presentation/core/styles/styles.dart';
 
-class StartScanTree extends StatelessWidget {
-  const StartScanTree({ Key? key }) : super(key: key);
+class ChipScanScreen extends StatelessWidget {
+  const ChipScanScreen({ Key? key }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

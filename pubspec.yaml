@@ -1,5 +1,5 @@
 name: terminal_frontend
-description: A new Flutter project.
+description: The Raspberry Pi Frontend Terminal App.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -13,11 +13,29 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # TODO Test 
+
+  window_size:
+    git:
+      url: git://github.com/google/flutter-desktop-embedding.git
+      path: plugins/window_size
+
+  # End Test
+
   qr_flutter: ^4.0.0
+
+  auto_route: ^3.1.3
+
+  get_it: ^7.2.0
+
   flutter_bloc: ^8.0.0
   equatable: ^2.0.3
   fpdart: ^0.0.12
-  
+  http: ^0.13.4
+  json_annotation: ^4.4.0
+
+  stream_channel: ^2.1.0
+  ffi: ^1.1.2
 
 
 dev_dependencies:
@@ -25,6 +43,10 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^1.0.0
+  build_runner: ^2.1.5
+
+  json_serializable: ^6.1.0
+  auto_route_generator: ^3.1.0
 
 
 flutter:
