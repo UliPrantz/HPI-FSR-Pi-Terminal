@@ -25,7 +25,7 @@ class ShoppingService extends ShoppingServiceInterface {
     
     Response response;
     try {
-      response = await httpClient.post(uri, body: body);
+      response = await httpClient.post(uri, body: body, retry: true);
     } catch (e) {
       return Either.left(ConnectionFailure());
     }

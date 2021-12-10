@@ -22,13 +22,11 @@ class CachedHttpClient {
 
   factory CachedHttpClient({
     required http.Client innerClient,
-    required String host,
+    required Uri uri,
     Map<String, String> headers = const <String, String>{},
-    bool https = true,
   }) {
-    final String scheme = https ? 'https' : 'http';
     _instance._innerClient ??= innerClient;
-    _instance._host ??= Uri(scheme: scheme, host: host);
+    _instance._host ??= uri;
     _instance._headers ??= headers;
     return _instance;
   }

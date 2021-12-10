@@ -15,12 +15,28 @@ class User with EquatableMixin {
     this.username,
   });
 
-  User.empty() : this(
+  User.empty({String? tokenId}) : this(
     uuid: "",
-    tokenId: "",
+    tokenId: tokenId ?? "",
     creationDate: DateTime.fromMillisecondsSinceEpoch(0),
     balance: 0,
   );
+
+  User copyWith({
+    final String? uuid,
+    final String? tokenId,
+    final DateTime? creationDate,
+    final double? balance,
+    final String? username,
+  }) {
+    return User(
+      uuid: uuid ?? this.uuid,
+      tokenId: tokenId ?? this.tokenId,
+      creationDate: creationDate ?? this.creationDate,
+      balance: balance ?? this.balance,
+      username: username ?? this.username,
+    );
+  }
 
   @override
   List<Object?> get props => [uuid, tokenId, creationDate, balance, username];

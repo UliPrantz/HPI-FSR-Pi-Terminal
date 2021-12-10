@@ -19,9 +19,10 @@ import 'package:terminal_frontend/infrastructure/user/user_serivce.dart';
 
 class InjectionContainer {
   // Terminal Constants
+  static const String scheme = "https";
   static const String host = "www.myhpi.de";
   static const Map<String, String> headers = {
-    'bearer' : "some_token"
+    'Bearer' : "some_token"
   };
 
   // get an instance of the GetIt singleton to use for injection
@@ -29,8 +30,9 @@ class InjectionContainer {
 
 
   static Future<void> injectDependencies() async {
+    final Uri uri = Uri(scheme: scheme, host: host);
     final CachedHttpClient httpClient = 
-      CachedHttpClient(innerClient: http.Client(), host: host, headers: headers);
+      CachedHttpClient(innerClient: http.Client(), uri: uri, headers: headers);
 
     final ChipScanServiceInterface chipScanService = ChipScanService();
     final PairingServiceInterface pairingService = PairingService(httpClient: httpClient);
@@ -39,7 +41,7 @@ class InjectionContainer {
     final UserServiceInterface userService = UserService(httpClient: httpClient);
 
     getIt.registerSingleton(ChipScanCubit(chipScanService: chipScanService));
-    getIt.registerSingleton(PairingCubit(pairingService: pairingService));
+    getIt.registerSingleton(PairingCubit(pairingService: pairingService,));
     getIt.registerSingleton(ShoppingCubit(shoppingService: shoppingService, userService: userService));
     getIt.registerSingleton(StartScreenCubit(terminalMetaDataService: terminalMetaDataService));
   }
