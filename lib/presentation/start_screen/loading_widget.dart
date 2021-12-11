@@ -43,4 +43,10 @@ class _LoadingWidgetState extends State<LoadingWidget> with SingleTickerProvider
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }
