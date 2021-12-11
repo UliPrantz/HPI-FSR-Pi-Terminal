@@ -10,5 +10,5 @@ class ChipScanState with EquatableMixin {
   ChipScanState.init() : this(chipDataAvailable: false, chipScanData: ChipScanData.empty());
 
   @override
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [chipDataAvailable, chipScanData];
 }

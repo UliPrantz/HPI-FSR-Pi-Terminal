@@ -20,11 +20,13 @@ class StartScreenCubit extends Cubit<StartScreenState> {
 
     result.fold(
       (httpFailure) {
-        //TODO add Error handling!
+        emit(state.copyWith(
+          loadingState: LoadingState.loadingFailed
+        ));
       }, 
       (terminalMetaData) {
         final newState = StartScreenState(
-          loaded: true,
+          loadingState: LoadingState.loadingSucceeded,
           terminalMetaData: terminalMetaData,
         );
         emit(newState);

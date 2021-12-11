@@ -34,5 +34,5 @@ class ShoppingState with EquatableMixin {
   }
 
   @override
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [userState, shoppingData, user];
 }

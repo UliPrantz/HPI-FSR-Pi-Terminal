@@ -34,15 +34,10 @@ class InjectionContainer {
     final CachedHttpClient httpClient = 
       CachedHttpClient(innerClient: http.Client(), uri: uri, headers: headers);
 
-    final ChipScanServiceInterface chipScanService = ChipScanService();
-    final PairingServiceInterface pairingService = PairingService(httpClient: httpClient);
-    final ShoppingServiceInterface shoppingService = ShoppingService(httpClient: httpClient);
-    final TerminalMetaDataServiceInterface terminalMetaDataService = TerminalMetaDataService(httpClient: httpClient);
-    final UserServiceInterface userService = UserService(httpClient: httpClient);
-
-    getIt.registerSingleton(ChipScanCubit(chipScanService: chipScanService));
-    getIt.registerSingleton(PairingCubit(pairingService: pairingService,));
-    getIt.registerSingleton(ShoppingCubit(shoppingService: shoppingService, userService: userService));
-    getIt.registerSingleton(StartScreenCubit(terminalMetaDataService: terminalMetaDataService));
+    getIt.registerSingleton(ChipScanService());
+    getIt.registerSingleton(PairingService(httpClient: httpClient));
+    getIt.registerSingleton(ShoppingService(httpClient: httpClient));
+    getIt.registerSingleton(TerminalMetaDataService(httpClient: httpClient));
+    getIt.registerSingleton(UserService(httpClient: httpClient));
   }
 }

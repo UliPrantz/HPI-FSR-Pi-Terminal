@@ -12,9 +12,9 @@ part 'app_router.gr.dart'; // .gr.dart is needed (doesn't work with .g.dart)
   
 @MaterialAutoRouter(     
   routes: <AutoRoute>[        
-    AutoRoute(page: StartScreen, initial: false),
+    AutoRoute(page: StartScreen, initial: true),
     AutoRoute(page: ChipScanScreen),
-    AutoRoute(page: ShopScreen, initial: true),
+    AutoRoute(page: ShopScreen, initial: false),
     AutoRoute(page: PairingScreen),            
   ],        
 ) 

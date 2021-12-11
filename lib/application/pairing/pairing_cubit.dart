@@ -22,10 +22,11 @@ class PairingCubit extends Cubit<PairingState> {
     Either<HttpFailure, User> result = await pairingService.pairUser(state.pairingData);
     result.fold(
       (failure) {
-        // TODO add error handling here
+        emit(state.copyWith(pairingProcessState: PairingProcessState.pairingFaild));
       }, 
       (user) {
         shoppingCubit.registerUserFromPairing(user);
+        emit(state.copyWith(pairingProcessState: PairingProcessState.pairingSucceeded));
       });
   }
 

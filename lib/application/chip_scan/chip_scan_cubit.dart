@@ -38,6 +38,11 @@ class ChipScanCubit extends Cubit<ChipScanState> {
   }
 
   void stopListingForChipData() {
-    _chipDataStreamSubscripiton?.cancel();
+    chipScanService.pauseReadingFunction();
+  }
+
+  void resumeListingForChipData() {
+    chipScanService.resumeReadingFunction();
+    emit(ChipScanState.init());
   }
 }
