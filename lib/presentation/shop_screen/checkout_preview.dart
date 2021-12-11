@@ -6,7 +6,7 @@ class CheckoutPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         vertical: 8.0,
         horizontal: 15.0
       ),
@@ -32,7 +32,7 @@ class CheckoutPreview extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _clearShoppingCart,
                   style: ButtonStyle(
                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
@@ -40,12 +40,12 @@ class CheckoutPreview extends StatelessWidget {
                       )
                     )
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.clear
                   )
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _checkout,
                   style: ButtonStyle(
                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
@@ -56,9 +56,9 @@ class CheckoutPreview extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
+                    children: const [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
                         child: Text(
                           "Checkout",
                         ),
@@ -75,5 +75,13 @@ class CheckoutPreview extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _checkout() {
+
+  }
+
+  void _clearShoppingCart() {
+
   }
 }

@@ -9,9 +9,18 @@ class TextStyles {
     fontSize: 80.0
   );
 
+  static const TextStyle errorTextStyle = TextStyle(
+    color: AppColors.white,
+  );
+
   static const TextStyle appBarText = TextStyle(
     color: AppColors.darkGrey,
     fontWeight: FontWeight.bold,
+  );
+
+  static const TextStyle appBarButton = TextStyle(
+    color: AppColors.darkGrey,
+    fontWeight: FontWeight.w500,
   );
 
   static const TextStyle mainTextBig = TextStyle(

@@ -10,7 +10,7 @@ class BalanceView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Center(
         child: Text(
-          "10.00€",
+          "Ihr Guthaben:\n10.00€",
           style: TextStyles.mainTextBig,
           textAlign: TextAlign.center,
         ),
