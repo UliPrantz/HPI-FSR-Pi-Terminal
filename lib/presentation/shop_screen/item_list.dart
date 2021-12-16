@@ -1,24 +1,36 @@
 import 'package:flutter/material.dart';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:terminal_frontend/application/shopping/shopping_cubit.dart';
+import 'package:terminal_frontend/application/shopping/shopping_state.dart';
 import 'package:terminal_frontend/presentation/shop_screen/item_card.dart';
 
 class ItemList extends StatelessWidget {
-  const ItemList({ Key? key }) : super(key: key);
+  final ShoppingCubit shoppingCubit;
+
+  const ItemList({Key? key, required this.shoppingCubit}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      child: GridView.builder(
-        itemCount: 15,
-        
-        physics: const AlwaysScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2
-        ), 
-        itemBuilder: (BuildContext context, int itemCount) => ItemCard(
-          itemId: itemCount
-        )
-      ),
+    return BlocBuilder<ShoppingCubit, ShoppingState>(
+      bloc: shoppingCubit,
+      builder: (context, state) {
+        return Container(
+          padding: const EdgeInsets.all(8.0),
+          child: GridView.builder(
+            itemCount: state.shoppingData.selectedItems.length,
+            physics: const AlwaysScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3
+            ), 
+            itemBuilder: (BuildContext context, int itemCount) => ItemCard(
+              shoppingCubit: shoppingCubit,
+              item: state.shoppingData.selectedItems.keys.elementAt(itemCount),
+            )
+          ),
+        );
+      }
     );
   }
 }

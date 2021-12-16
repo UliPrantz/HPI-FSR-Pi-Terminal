@@ -51,6 +51,9 @@ app.*.map.json
 *.g.dart
 *.gr.dart
 
+# Ignore the enviorment file to protect credentials
+/assets/env.yaml
+
 ### MacOs related stuff ###
 # General
 .DS_Store

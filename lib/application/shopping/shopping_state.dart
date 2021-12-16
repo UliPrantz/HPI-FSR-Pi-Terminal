@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import 'package:terminal_frontend/domain/shopping/shopping_data.dart';
+import 'package:terminal_frontend/domain/terminal_meta_data/item.dart';
 import 'package:terminal_frontend/domain/user/user.dart';
 
 enum UserState {
@@ -15,9 +16,12 @@ class ShoppingState with EquatableMixin {
   final User user;
 
   ShoppingState({required this.userState, required this.shoppingData, required this.user});
-  ShoppingState.init({required String tokenId}) : this(
+  ShoppingState.init({
+    required String tokenId,
+    required String tag,
+    required List<Item> items}) : this(
     userState: UserState.loadingUser,
-    shoppingData: ShoppingData.empty(), 
+    shoppingData: ShoppingData.empty(items: items, tag: tag), 
     user: User.empty(tokenId: tokenId)
   );
 

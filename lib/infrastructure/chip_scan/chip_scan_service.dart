@@ -95,8 +95,6 @@ class ChipScanService extends ChipScanServiceInterface {
     return Either.right(unit);
   }
 
-
-  @override
   static Either<RfidFailure, ChipScanData> _getUid() {
     assert(_didInit, "This RfidReader wasn't init yet!");
     assert(!_closed, "This RfidReader instance was already closed!");

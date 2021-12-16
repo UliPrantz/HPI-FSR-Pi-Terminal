@@ -105,9 +105,9 @@ class CachedHttpClient {
       } on FormatException {
         body = tmpHttpResponse.bodyBytes;
       }
-      } else {
-        body = <String, dynamic>{};
-      }
+    } else {
+      body = <String, dynamic>{};
+    }
 
     return Response(
       body: body, 

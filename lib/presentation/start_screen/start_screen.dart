@@ -18,17 +18,20 @@ class StartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<StartScreenCubit, StartScreenState>(
-      bloc: StartScreenCubit(terminalMetaDataService: GetIt.I<TerminalMetaDataService>()),
+      bloc: GetIt.I<StartScreenCubit>(),
       listener: (context, state) {
         if (state.loadingState == LoadingState.loadingSucceeded) {
-          AutoRouter.of(context).push(const ChipScanScreenRoute());
+          //AutoRouter.of(context).replace(ChipScanScreenRoute()); TODO change
+          AutoRouter.of(context).push(ShopScreenRoute(items: state.terminalMetaData.items, tag: "", tokenId: ""));
         }
       },
-      builder: (context, state) => Scaffold(
-        backgroundColor: AppColors.darkGrey,
-        body: state.loadingState != LoadingState.loadingFailed ? 
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: AppColors.darkGrey,
+          body: state.loadingState != LoadingState.loadingFailed ? 
                           const LoadingWidget() : const ErrorWidget(),
-      ),
+        );
+      },
     );
   }
 }

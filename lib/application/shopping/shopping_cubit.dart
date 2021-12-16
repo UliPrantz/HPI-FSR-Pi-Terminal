@@ -1,5 +1,8 @@
 import 'dart:collection';
 
+import 'package:flutter/material.dart';
+
+import 'package:auto_route/auto_route.dart';
 import "package:bloc/bloc.dart";
 import 'package:fpdart/fpdart.dart';
 
@@ -11,17 +14,34 @@ import 'package:terminal_frontend/domain/shopping/shopping_service_interface.dar
 import 'package:terminal_frontend/domain/terminal_meta_data/item.dart';
 import 'package:terminal_frontend/domain/user/user.dart';
 import 'package:terminal_frontend/domain/user/user_service_interface.dart';
+import 'package:terminal_frontend/presentation/app_router.dart';
+import 'package:terminal_frontend/presentation/checkout_screen/checkout_screen.dart';
 
 class ShoppingCubit extends Cubit<ShoppingState> {
+  static const int secondsToShowCheckoutScreen = 5;
+
   final ShoppingServiceInterface shoppingService;
   final UserServiceInterface userService;
 
   ShoppingCubit({
     required this.shoppingService, 
     required this.userService,
-    required ChipScanCubit chipScanCubit,
-  }) : super(ShoppingState.init(tokenId: chipScanCubit.state.chipScanData.uuid)) {
+    required String tokenId,
+    required String tag,
+    required List<Item> items,
+  }) : super(ShoppingState.init(tokenId: tokenId, items: items, tag: tag)) {
     getUserBalance();
+  }
+
+  bool get showPairingButton {
+    switch (state.userState) {
+      case UserState.loadingUser:
+      case UserState.loadingUserFailed:
+      case UserState.loadedPairedUser:
+        return false;
+      case UserState.loadedaAnonymousUser:
+        return true;
+    }
   }
 
   void getUserBalance() async {
@@ -57,38 +77,65 @@ class ShoppingCubit extends Cubit<ShoppingState> {
   void addItemToCart(Item item) {
     int newItemCount = state.shoppingData.overallItemCount + 1;
     int newPurchaseCost = state.shoppingData.purchaseCost + item.price;
-    Map<Item, int> tmpSelectedItems = state.shoppingData.selectedItems;
+    Map<Item, int> tmpSelectedItems = Map.from(state.shoppingData.selectedItems);
     
+    // increase the counter of the corresponding item
     if (tmpSelectedItems.containsKey(item)) { //actually this should always be true!
       tmpSelectedItems[item] = tmpSelectedItems[item]! + 1;
-    } 
+    }
+
+    final String newDescription = createDescriptionString(tmpSelectedItems);
 
     final ShoppingData newShoppingData = state.shoppingData.copyWith(
       overallItemCount: newItemCount,
       purchaseCost: newPurchaseCost,
       selectedItems: UnmodifiableMapView(tmpSelectedItems),
+      transactionDescription: newDescription,
     );
 
     emit(state.copyWith(shoppingData: newShoppingData));
   }
 
-  void resetShoppingCart() {
+  String createDescriptionString(Map<Item, int> itemMap) {
+    final StringBuffer newDescriptionStringBuffer = StringBuffer("Your order: ");
+    itemMap.forEach((key, value) {
+      newDescriptionStringBuffer.write("${value}x ${key.name}, ");
+    });
+    return newDescriptionStringBuffer.toString().trim();
+  }
+
+  void clearShoppingCart() {
     int newItemCount = 0;
     int newPurchaseCost = 0;
-    Map<Item, int> tmpSelectedItems = state.shoppingData.selectedItems;
-    tmpSelectedItems.map((key, value) => MapEntry(key, 0));
+    Map<Item, int> resetedMap = Map.from(
+      state.shoppingData.selectedItems.map(
+        (key, value) => MapEntry(key, 0)
+      )
+    );
 
     final ShoppingData newShoppingData = state.shoppingData.copyWith(
       overallItemCount: newItemCount,
       purchaseCost: newPurchaseCost,
-      selectedItems: UnmodifiableMapView(tmpSelectedItems),
+      selectedItems: UnmodifiableMapView(resetedMap),
     );
 
     emit(state.copyWith(shoppingData: newShoppingData));
   }
 
-  void checkout() {
+  int checkout() {
     assert(state.userState != UserState.loadingUser, "Always wait until some kind of data is loaded before calling checkout!");
     shoppingService.sendCheckoutTransaction(state.shoppingData, state.user.tokenId);
+    
+    int newBalance = state.user.balance - state.shoppingData.purchaseCost;
+    return newBalance;
+  }
+
+  void showCheckoutScreen(BuildContext context, int newBalance) {
+    AutoRouter.of(context).push(CheckoutScreenRoute(newBalance: newBalance));
+    
+    // register a future which navigates back to the chip scan screen
+    Future.delayed(const Duration(seconds: secondsToShowCheckoutScreen), () {
+      logoutRoute(context);
+    });
   }
 }

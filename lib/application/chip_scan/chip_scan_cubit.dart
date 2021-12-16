@@ -25,7 +25,7 @@ class ChipScanCubit extends Cubit<ChipScanState> {
   }
   
   void listenForChipData() async {
-    if (_chipDataStreamSubscripiton != null) {
+    if (_chipDataStreamSubscripiton == null) {
       final Stream<ChipScanData> chipDataStream = await chipScanService.getUidStream();
       _chipDataStreamSubscripiton = chipDataStream.listen((chipScanData) { 
         final ChipScanState newState = ChipScanState(

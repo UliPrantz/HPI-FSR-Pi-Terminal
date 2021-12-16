@@ -21,14 +21,29 @@ class ShoppingData with EquatableMixin {
     required this.idempotencyKey,
   });
 
-  ShoppingData.empty() : this(
-    purchaseCost: 0, 
-    overallItemCount: 0,
-    selectedItems: UnmodifiableMapView({}),
-    transactionDescription: "",
-    tag: "",
-    idempotencyKey: "",
-  );
+  factory ShoppingData.empty({
+    List<Item>? items,
+    String? transactionDescription,
+    String? tag,
+  }) {
+    UnmodifiableMapView<Item, int> itemMap = UnmodifiableMapView({});
+    if (items != null) {
+      itemMap = UnmodifiableMapView(
+        Map.fromEntries(
+          items.map((item) => MapEntry(item, 0))
+        )
+      );
+    }
+
+    return ShoppingData(
+      purchaseCost: 0, 
+      overallItemCount: 0,
+      selectedItems: itemMap,
+      transactionDescription: transactionDescription ?? "",
+      tag: tag ?? "",
+      idempotencyKey: "",
+    );
+  }
 
   ShoppingData copyWith({
     int? purchaseCost,

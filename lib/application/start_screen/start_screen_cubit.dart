@@ -32,4 +32,9 @@ class StartScreenCubit extends Cubit<StartScreenState> {
         emit(newState);
       });
   }
+
+  void retry() {
+    emit(StartScreenState.init());
+    _fetchTerminalMetaData();
+  }
 }

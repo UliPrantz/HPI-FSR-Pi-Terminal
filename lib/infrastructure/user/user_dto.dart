@@ -14,7 +14,7 @@ class UserDto {
   @JsonKey(name: 'created_at')
   final DateTime creationDate;
 
-  final double balance;
+  final int balance;
 
   @JsonKey(name: 'paired_user')
   final String? username;

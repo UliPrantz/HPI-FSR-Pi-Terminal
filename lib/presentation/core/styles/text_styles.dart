@@ -11,6 +11,14 @@ class TextStyles {
 
   static const TextStyle errorTextStyle = TextStyle(
     color: AppColors.white,
+    fontWeight: FontWeight.w400,
+    fontSize: 20.0,
+  );
+
+  static const TextStyle errorButtonTextStyle = TextStyle(
+    color: AppColors.black,
+    fontWeight: FontWeight.w400,
+    fontSize: 20.0,
   );
 
   static const TextStyle appBarText = TextStyle(
@@ -21,6 +29,16 @@ class TextStyles {
   static const TextStyle appBarButton = TextStyle(
     color: AppColors.darkGrey,
     fontWeight: FontWeight.w500,
+  );
+
+  static const TextStyle normalTextWhite = TextStyle(
+    color: AppColors.white,
+    fontWeight: FontWeight.w400,
+  );
+
+  static const TextStyle normalTextBlack = TextStyle(
+    color: AppColors.black,
+    fontWeight: FontWeight.w400,
   );
 
   static const TextStyle mainTextBig = TextStyle(

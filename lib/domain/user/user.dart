@@ -4,7 +4,7 @@ class User with EquatableMixin {
   final String uuid;
   final String tokenId;
   final DateTime creationDate;
-  final double balance;
+  final int balance;
   final String? username;
 
   User({
@@ -26,7 +26,7 @@ class User with EquatableMixin {
     final String? uuid,
     final String? tokenId,
     final DateTime? creationDate,
-    final double? balance,
+    final int? balance,
     final String? username,
   }) {
     return User(
