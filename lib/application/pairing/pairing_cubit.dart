@@ -10,23 +10,30 @@ import 'package:terminal_frontend/domain/user/user.dart';
 
 class PairingCubit extends Cubit<PairingState> {
   final PairingServiceInterface pairingService;
-  final ShoppingCubit shoppingCubit;
 
   PairingCubit({
     required this.pairingService,
-    required ChipScanCubit chipScanCubit,
-    required this.shoppingCubit
-  }) : super(PairingState.init(tokenId: chipScanCubit.state.chipScanData.uuid));
+    required String tokenId,
+  }) : super(PairingState.init(tokenId: tokenId));
 
   void pairChip() async {
     Either<HttpFailure, User> result = await pairingService.pairUser(state.pairingData);
+
     result.fold(
       (failure) {
-        emit(state.copyWith(pairingProcessState: PairingProcessState.pairingFaild));
+        emit(
+          state.copyWith(
+            pairingProcessState: PairingProcessState.pairingFaild
+          )
+        );
       }, 
       (user) {
-        shoppingCubit.registerUserFromPairing(user);
-        emit(state.copyWith(pairingProcessState: PairingProcessState.pairingSucceeded));
+        emit(
+          state.copyWith(
+            pairingProcessState: PairingProcessState.pairingSucceeded,
+            user: user
+          )
+        );
       });
   }
 

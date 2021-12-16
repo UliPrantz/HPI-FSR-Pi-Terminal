@@ -4,6 +4,7 @@ import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 
 import 'package:terminal_frontend/domain/terminal_meta_data/item.dart';
+import 'package:terminal_frontend/domain/user/user.dart';
 import 'package:terminal_frontend/presentation/checkout_screen/checkout_screen.dart';
 import 'package:terminal_frontend/presentation/chip_scan_screen/scan_screen.dart';
 import 'package:terminal_frontend/presentation/pairing_screen/pairing_screen.dart';
@@ -17,7 +18,7 @@ part 'app_router.gr.dart'; // .gr.dart is needed (doesn't work with .g.dart)
     AutoRoute(page: StartScreen, initial: true),
     AutoRoute(page: ChipScanScreen),
     AutoRoute(page: ShopScreen),
-    AutoRoute(page: PairingScreen),            
+    AutoRoute<User>(page: PairingScreen),            
     AutoRoute(page: CheckoutScreen),
   ],        
 ) 

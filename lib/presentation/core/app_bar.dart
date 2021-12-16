@@ -11,13 +11,17 @@ class FsrWalletAppBar extends AppBar {
   final bool showPairing;
   final bool showBack;
 
+  final VoidCallback? pairingPressedCallback;
+
   FsrWalletAppBar({
     Key? key, 
     this.showLogout=false, 
     this.showPairing=false, 
-    this.showBack=false
+    this.showBack=false,
+    this.pairingPressedCallback,
   }) : 
   assert(!(showPairing && showBack), "Only one of 'showPairing' and 'showBack' can be true!"),
+  assert(!showPairing || (pairingPressedCallback != null), "When pairing button should be shown, then the callback must be also provided!"),
   super(
     key: key,
     automaticallyImplyLeading: false,
@@ -35,11 +39,12 @@ class FsrWalletAppBar extends AppBar {
               style: TextStyles.appBarText
             ),
             
-            if (showPairing || showBack)
-              AppBarButton(text: showBack ? "Back" : "Pairing", callback: () => _pairingCallback(context)),
-            
+            if (showPairing)
+              AppBarButton(text: "Pairing", callback: pairingPressedCallback!),
+            if (showBack)
+              AppBarButton(text: "Back", callback: () => _backCallback(context)),
             // just needed to center the title if no right button is shown
-            if (!(showPairing && showBack))
+            if (!(showPairing || showBack))
               Container(
                 // can be hard coded since we are always on raspi 7'' touchscreen
                 width: 66.0,
@@ -55,7 +60,7 @@ class FsrWalletAppBar extends AppBar {
     logoutRoute(context);
   }
 
-  static void _pairingCallback(BuildContext context) {
-    AutoRouter.of(context).push(const PairingScreenRoute());
+  static void _backCallback(BuildContext context) {
+    AutoRouter.of(context).pop();
   }
 }

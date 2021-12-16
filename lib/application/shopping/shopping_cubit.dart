@@ -50,9 +50,12 @@ class ShoppingCubit extends Cubit<ShoppingState> {
 
     result.fold(
       (failure) {
+        final UserState newUserState = failure is UserNotFound ? 
+            UserState.loadedaAnonymousUser : UserState.loadingUserFailed;
+
         emit(
           state.copyWith(
-            userState: UserState.loadingUserFailed,
+            userState: newUserState,
             user: state.user.copyWith(tokenId: tokenId),
           )
         );
@@ -71,7 +74,12 @@ class ShoppingCubit extends Cubit<ShoppingState> {
   }
 
   void registerUserFromPairing(User user) {
-    emit(state.copyWith(user: user));
+    emit(
+      state.copyWith(
+        userState: UserState.loadedPairedUser,
+        user: user
+      )
+    );
   }
 
   void addItemToCart(Item item) {
