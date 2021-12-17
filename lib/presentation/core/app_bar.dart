@@ -28,27 +28,24 @@ class FsrWalletAppBar extends AppBar {
     title: Builder(
       builder: (context) {
         return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             if (showLogout)
               AppBarButton(text: "Logout", callback: () => _logoutCallback(context)),
+
+            const Spacer(),
 
             const Text(
               "FSR Wallet",
               style: TextStyles.appBarText
             ),
             
+            const Spacer(),
+
             if (showPairing)
               AppBarButton(text: "Pairing", callback: pairingPressedCallback!),
             if (showBack)
               AppBarButton(text: "Back", callback: () => _backCallback(context)),
-            // just needed to center the title if no right button is shown
-            if (!(showPairing || showBack))
-              Container(
-                // can be hard coded since we are always on raspi 7'' touchscreen
-                width: 66.0,
-              )
           ],
         );
       }

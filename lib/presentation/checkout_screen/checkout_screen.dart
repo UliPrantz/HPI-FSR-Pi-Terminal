@@ -19,7 +19,7 @@ class CheckoutScreen extends StatelessWidget {
       appBar: FsrWalletAppBar(),
       body: Center(
         child: Text(
-          "Neues Guthaben:\n$newBalance€",
+          "Neues Guthaben:\n$newBalance",
           textAlign: TextAlign.center,
         ),
       ),

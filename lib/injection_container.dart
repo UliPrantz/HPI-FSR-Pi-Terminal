@@ -14,6 +14,13 @@ import 'package:terminal_frontend/infrastructure/shopping/shopping_service.dart'
 import 'package:terminal_frontend/infrastructure/terminal_meta_data/terminal_meta_data_service.dart';
 import 'package:terminal_frontend/infrastructure/user/user_serivce.dart';
 
+class EnvironmentConfig {
+  final Uri serverUri;
+  final String authToken;
+
+  const EnvironmentConfig({required this.serverUri, required this.authToken});
+}
+
 class InjectionContainer {
   static const String envPath = 'assets/env.yaml';
   static const String envKey = 'environment';
@@ -38,26 +45,36 @@ class InjectionContainer {
   ///   terminal_token: "www.myhpi.de"
   ///   host_name: "SomePrettyLongToken"
   /// -----End example 'env.yaml'-----
-  static Future<dynamic> _getEnvConfig() async {
+  static Future<EnvironmentConfig> _getEnvConfig() async {
     WidgetsFlutterBinding.ensureInitialized();
-    final String confYaml = await rootBundle.loadString(envPath);
-    return loadYaml(confYaml);
+    // final String confYaml = await rootBundle.loadString(envPath);
+    // final configMap = loadYaml(confYaml);
+
+    // TODO remove it
+    final configMap = {envKey: {schemeKey:"https", hostKey: "hpi-wallet-backend.test", tokenKey: "47umEV6vcla51g40rfvW6cvwQfP36m7nSNMElBtD"}};
+    // end remove it
+
+    final envConfigs = configMap[envKey]!;
+
+    return EnvironmentConfig(
+      serverUri: Uri(
+        scheme: envConfigs[schemeKey]!, 
+        host: envConfigs[hostKey]!
+      ), 
+      authToken: envConfigs[tokenKey]!
+    );
   }
 
   static Future<void> injectDependencies() async {
-    // TODO change BACK!!!! //final configMap = await _getEnvConfig();
-    final configMap = {envKey: {schemeKey:"https", hostKey: "hpi-wallet-backend.test", tokenKey: "47umEV6vcla51g40rfvW6cvwQfP36m7nSNMElBtD"}};
-    final envConfigs = configMap[envKey]!;
+    final EnvironmentConfig envConfig = await _getEnvConfig();
 
-    final Uri uri = Uri(
-      scheme: envConfigs[schemeKey]!, 
-      host: envConfigs[hostKey]!
-    );
     final Map<String, String> headers = <String, String>{
-      'Authorization' : 'Bearer ${envConfigs[tokenKey]!}'
+      'Authorization' : 'Bearer ${envConfig.authToken}'
     };
     final CachedHttpClient httpClient = 
-      CachedHttpClient(innerClient: http.Client(), uri: uri, headers: headers);
+      CachedHttpClient(innerClient: http.Client(), uri: envConfig.serverUri, headers: headers);
+
+    getIt.registerSingleton(envConfig);
 
     getIt.registerSingleton(ChipScanService());
     getIt.registerSingleton(PairingService(httpClient: httpClient));

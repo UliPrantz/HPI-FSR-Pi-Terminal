@@ -9,6 +9,7 @@ import 'package:terminal_frontend/domain/pairing/pairing_service_interface.dart'
 import 'package:terminal_frontend/domain/user/user.dart';
 
 class PairingCubit extends Cubit<PairingState> {
+  static const int maxPairCodeLength = 8;
   final PairingServiceInterface pairingService;
 
   PairingCubit({
@@ -38,19 +39,33 @@ class PairingCubit extends Cubit<PairingState> {
   }
 
   void addCharacter(String character) {
-    String newCode = state.pairingData.pairingCode + character;
-    
-    final PairingState newState = 
-      state.copyWith(pairingData: state.pairingData.copyWith(pairingCode: newCode));
-    emit(newState);
+    if (state.pairingData.pairingCode.length < 8) {
+      String newCode = state.pairingData.pairingCode + character;
+      
+      final PairingState newState = 
+        state.copyWith(pairingData: state.pairingData.copyWith(pairingCode: newCode));
+      emit(newState);
+    }
   }
 
   void removeCharacter() {
     String newCode = state.pairingData.pairingCode;
-    newCode = newCode.substring(0, newCode.length);
+    if (newCode.isNotEmpty) {
+      newCode = newCode.substring(0, newCode.length - 1);
+    }
 
     PairingState newState = 
       state.copyWith(pairingData: state.pairingData.copyWith(pairingCode: newCode));
     emit(newState);
+  }
+
+  String getPairingCodeDigit(int index) {
+    assert(index >= 0, "Index must be greater or equal 0!");
+    
+    final String pairingCode = state.pairingData.pairingCode;
+    if (index >= pairingCode.length) {
+      return '-';
+    }
+    return pairingCode[index];
   }
 }

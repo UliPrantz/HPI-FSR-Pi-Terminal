@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'package:terminal_frontend/presentation/core/styles/styles.dart';
+
 class DigitContainer extends StatelessWidget {
+  final String digit;
+
   const DigitContainer({
     Key? key,
+    required this.digit,
   }) : super(key: key);
 
   @override
@@ -26,11 +31,8 @@ class DigitContainer extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          "0",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 15.0
-          )
+          digit,
+          style: TextStyles.normalTextBlack,
         ),
       ),
     );
