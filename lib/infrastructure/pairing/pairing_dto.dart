@@ -8,6 +8,8 @@ part 'pairing_dto.g.dart';
 class PairingDto {
   @JsonKey(ignore: true)
   final String tokenId;
+
+  @JsonKey(name: 'pairing_code')
   final String pairingCode;
 
   PairingDto({required this.tokenId, required this.pairingCode});

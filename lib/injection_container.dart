@@ -26,7 +26,7 @@ class InjectionContainer {
   static const String envKey = 'environment';
   static const String schemeKey = 'scheme';
   static const String hostKey = 'host_name';
-  static const String tokenKey = 'terminal_token';
+  static const String terminalTokenKey = 'terminal_token';
 
   // get an instance of the GetIt singleton to use for injection
   static final GetIt getIt = GetIt.I; // equal to: GetIt.instance;
@@ -51,7 +51,7 @@ class InjectionContainer {
     // final configMap = loadYaml(confYaml);
 
     // TODO remove it
-    final configMap = {envKey: {schemeKey:"https", hostKey: "hpi-wallet-backend.test", tokenKey: "47umEV6vcla51g40rfvW6cvwQfP36m7nSNMElBtD"}};
+    final configMap = {envKey: {schemeKey:"https", hostKey: "hpi-wallet-backend.test", terminalTokenKey: "47umEV6vcla51g40rfvW6cvwQfP36m7nSNMElBtD"}};
     // end remove it
 
     final envConfigs = configMap[envKey]!;
@@ -61,7 +61,7 @@ class InjectionContainer {
         scheme: envConfigs[schemeKey]!, 
         host: envConfigs[hostKey]!
       ), 
-      authToken: envConfigs[tokenKey]!
+      authToken: envConfigs[terminalTokenKey]!
     );
   }
 
@@ -69,7 +69,8 @@ class InjectionContainer {
     final EnvironmentConfig envConfig = await _getEnvConfig();
 
     final Map<String, String> headers = <String, String>{
-      'Authorization' : 'Bearer ${envConfig.authToken}'
+      'Authorization' : 'Bearer ${envConfig.authToken}',
+      'content-type' : 'application/json',
     };
     final CachedHttpClient httpClient = 
       CachedHttpClient(innerClient: http.Client(), uri: envConfig.serverUri, headers: headers);

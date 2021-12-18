@@ -5,7 +5,7 @@ abstract class HttpFailure extends Failure {}
 class AuthFailure extends HttpFailure {}
 class ConnectionFailure extends HttpFailure {}
 class InvalidRequest extends HttpFailure {}
-class PairingTokenExpired extends HttpFailure {}
+class PairingTokenNotFound extends HttpFailure {}
 class UserNotFound extends HttpFailure {}
 
 // --RfidFailures--

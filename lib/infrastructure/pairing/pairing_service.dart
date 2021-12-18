@@ -11,8 +11,8 @@ import 'package:terminal_frontend/infrastructure/pairing/pairing_dto.dart';
 import 'package:terminal_frontend/infrastructure/user/user_dto.dart';
 
 class PairingService extends PairingServiceInterface {
-  // actual endpoint: /pos/wallets/token/<TOKEN_ID>
-  static const String endpoint = "/pos/wallets/token/"; // end with <TOKEN_ID>!!! //PUT
+  // actual endpoint: /pos/wallets/token/<TOKEN_ID> //PUT
+  static const String endpoint = "/pos/wallets/token/";
 
   final CachedHttpClient httpClient;
 
@@ -36,7 +36,7 @@ class PairingService extends PairingServiceInterface {
       case 401: 
         return Either.left(AuthFailure());
       case 404:
-        return Either.left(PairingTokenExpired());
+        return Either.left(PairingTokenNotFound());
     }
     
     final UserDto userDto = UserDto.fromJson(response.bodyAsMap);

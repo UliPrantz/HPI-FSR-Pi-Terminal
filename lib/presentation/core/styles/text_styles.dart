@@ -46,4 +46,10 @@ class TextStyles {
     fontSize: 30.0,
     fontWeight: FontWeight.bold
   );
+
+  static const TextStyle checkOutScreenText = TextStyle(
+    color: AppColors.white,
+    fontSize: 40.0,
+    fontWeight: FontWeight.bold
+  );
 }

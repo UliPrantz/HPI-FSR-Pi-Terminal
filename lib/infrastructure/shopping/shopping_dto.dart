@@ -10,13 +10,12 @@ part 'shopping_dto.g.dart';
 // Just a quick and dirty Random-String-Generator
 const String _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
 final Random _rnd = Random();
-
 String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
     length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
 
 
 // declaring the default tag
-const String defaultTag = "Purchase";
+const String defaultTag = "purchase";
 
 @JsonSerializable(explicitToJson: true, createFactory: false)
 class ShoppingDto {

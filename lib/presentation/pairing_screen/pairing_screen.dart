@@ -10,12 +10,15 @@ import 'package:terminal_frontend/domain/user/user.dart';
 import 'package:terminal_frontend/infrastructure/pairing/pairing_service.dart';
 import 'package:terminal_frontend/injection_container.dart';
 import 'package:terminal_frontend/presentation/core/app_bar.dart';
+import 'package:terminal_frontend/presentation/core/snack_bar.dart';
 import 'package:terminal_frontend/presentation/core/styles/colors.dart';
 import 'package:terminal_frontend/presentation/pairing_screen/numpad.dart';
 import 'package:terminal_frontend/presentation/pairing_screen/pairing_code_input.dart';
 import 'package:terminal_frontend/presentation/pairing_screen/qr_code_info.dart';
 
 class PairingScreen extends StatelessWidget {
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
+
   final String tokenId;
   final PairingCubit pairingCubit;
 
@@ -35,6 +38,7 @@ class PairingScreen extends StatelessWidget {
       bloc: pairingCubit,
       listener: pairingStateChanged,
       child: Scaffold(
+        key: scaffoldKey,
         appBar: FsrWalletAppBar(showLogout: true, showBack: true,),
         body: Row(
           children: [
@@ -84,14 +88,22 @@ class PairingScreen extends StatelessWidget {
   }
 
   void _onPairPressed() {
-    // TODO add error handling
     pairingCubit.pairChip();
   }
 
   void pairingStateChanged(BuildContext context, PairingState state) {
-    // TODO add error handling
-    if (state.pairingProcessState == PairingProcessState.pairingSucceeded) {
-      AutoRouter.of(context).pop<User>();
+    switch (state.pairingProcessState) {
+      case PairingProcessState.notPairedYet:
+        break;
+      case PairingProcessState.pairingNotPossible:
+        showSnackBar(scaffoldKey: scaffoldKey, text: "Pairing currently not possible. Please try later again.");
+        break;
+      case PairingProcessState.pairingTokenNotFound:
+        showSnackBar(scaffoldKey: scaffoldKey, text: "Pairing-Token was not found or is already expired/used.");
+        break;
+      case PairingProcessState.pairingSucceeded:
+        AutoRouter.of(context).pop<User>(state.user);
+        break;
     }
   }
 }

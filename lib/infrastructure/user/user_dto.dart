@@ -6,13 +6,13 @@ part 'user_dto.g.dart';
 @JsonSerializable()
 class UserDto {
   @JsonKey(name: 'id')
-  final String uuid;
+  final String? uuid;
 
   @JsonKey(name: 'token_id')
   final String tokenId;
 
   @JsonKey(name: 'created_at')
-  final DateTime creationDate;
+  final DateTime? creationDate;
 
   final int balance;
 
@@ -20,9 +20,9 @@ class UserDto {
   final String? username;
 
   UserDto({
-    required this.uuid,
+    this.uuid,
     required this.tokenId,
-    required this.creationDate,
+    this.creationDate,
     required this.balance,
     this.username,
   });

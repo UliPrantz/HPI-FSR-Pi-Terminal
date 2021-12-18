@@ -18,7 +18,7 @@ import 'package:terminal_frontend/presentation/app_router.dart';
 import 'package:terminal_frontend/presentation/checkout_screen/checkout_screen.dart';
 
 class ShoppingCubit extends Cubit<ShoppingState> {
-  static const int secondsToShowCheckoutScreen = 5;
+  static const int secondsToShowCheckoutScreen = 3;
 
   final ShoppingServiceInterface shoppingService;
   final UserServiceInterface userService;
@@ -105,11 +105,11 @@ class ShoppingCubit extends Cubit<ShoppingState> {
   }
 
   String createDescriptionString(Map<Item, int> itemMap) {
-    final StringBuffer newDescriptionStringBuffer = StringBuffer("Your order: ");
+    final List<String> itemStrings = [];
     itemMap.forEach((key, value) {
-      newDescriptionStringBuffer.write("${value}x ${key.name}, ");
+      itemStrings.add("$value x ${key.name}");
     });
-    return newDescriptionStringBuffer.toString().trim();
+    return itemStrings.join(', ');
   }
 
   void clearShoppingCart() {

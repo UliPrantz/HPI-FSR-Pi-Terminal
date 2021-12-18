@@ -5,7 +5,8 @@ import 'package:terminal_frontend/domain/user/user.dart';
 
 enum PairingProcessState {
   notPairedYet,
-  pairingFaild,
+  pairingNotPossible,
+  pairingTokenNotFound,
   pairingSucceeded,
 }
 class PairingState with EquatableMixin {

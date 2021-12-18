@@ -18,13 +18,25 @@ class PairingCubit extends Cubit<PairingState> {
   }) : super(PairingState.init(tokenId: tokenId));
 
   void pairChip() async {
+    // this is just here that we have a change in state everytime this method is 
+    // is called otherwise bloc would optimize that away and we couldn't show 
+    // a snackbar
+    emit(
+      state.copyWith(
+        pairingProcessState: PairingProcessState.notPairedYet,
+      )
+    );
+
     Either<HttpFailure, User> result = await pairingService.pairUser(state.pairingData);
 
     result.fold(
       (failure) {
+        final PairingProcessState newPairingState = failure is PairingTokenNotFound ? 
+            PairingProcessState.pairingTokenNotFound : PairingProcessState.pairingNotPossible;
+
         emit(
           state.copyWith(
-            pairingProcessState: PairingProcessState.pairingFaild
+            pairingProcessState: newPairingState,
           )
         );
       }, 
