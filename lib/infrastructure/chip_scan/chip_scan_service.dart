@@ -2,15 +2,14 @@ import 'dart:async';
 import 'dart:ffi';
 import 'dart:isolate';
 
-
 import 'package:fpdart/fpdart.dart';
 import 'package:stream_channel/isolate_channel.dart';
-import 'package:ffi/ffi.dart';
 
 import 'package:terminal_frontend/domain/chip_scan/chip_scan_data.dart';
 import 'package:terminal_frontend/domain/chip_scan/chip_scan_service_interface.dart';
 import 'package:terminal_frontend/domain/core/basic_failures.dart';
 import 'package:terminal_frontend/infrastructure/chip_scan/chip_scan_dto.dart';
+import 'package:terminal_frontend/infrastructure/chip_scan/rfid_reader.dart';
 
 // At the bottom there also is a dart cli example for the Pi
 //----START---- The underlying C Code ----START----
@@ -52,93 +51,91 @@ typedef InitPN532Dart = int Function(Pointer<PN532> pn532);
 typedef GetUid = Int32 Function(Pointer<PN532> pn532, Pointer<Uint8> data);
 typedef GetUidDart = int Function(Pointer<PN532> pn532, Pointer<Uint8> data);
 
+enum IsolateCommand {
+  startReading,
+  stopReading,
+  terminate
+}
+
 class ChipScanService extends ChipScanServiceInterface {
-  static const String dyRfidLibPath = "";
-  static const int uidMaxLength = 10;
+  static const Duration pauseBetweenScan = Duration(seconds: 1);
 
-  static bool _didInit = false;
-  static bool _closed = false;
+  bool _started = false;
+  bool _stopped = false;
 
-  static final Pointer<PN532> _pn532Pointer = calloc.allocate(sizeOf<PN532>());
-  static final Pointer<Uint8> _dataArrPointer = calloc.allocate(sizeOf<Uint8>() * uidMaxLength);
+  Isolate? _rfidReaderIsolate;
+  IsolateChannel? _rootIsolateChannel;
 
-  static late final GetUidDart _getUidFunction;
+  Stream<ChipScanData>? _uidBroadcastStream;
 
-  Isolate? rfidReaderIsolate;
-  IsolateChannel? rootIsolateChannel;
-  
-  /// This class must be called before the RfidReader can be used!
-  /// There is no underlying class RfidReader since it would be completely obsolete.
-  /// Such a class could be added later.
-  /// 
-  /// @throws DynamicLibrary.open() and the .lookup function can throw!
-  ///         These errors aren't handeled for a good reason. If this happens
-  ///         the provided driver C library is broken or couldn't be found. 
-  ///         Then you need to put it in the right place or recompile it!
   @override
-  Either<RfidFailure, Unit> initRfidReader() {
-    assert(!_didInit, "This RfidReader was already init!");
-    assert(!_closed, "This RfidReader instance was already closed!");
+  Future<void> startIsolate() async {
+    ReceivePort receivePort = ReceivePort();
+    _rootIsolateChannel = IsolateChannel.connectReceive(receivePort);
+    _rfidReaderIsolate = await Isolate.spawn(_uidIsolate, receivePort.sendPort);
+    _uidBroadcastStream = _rootIsolateChannel!.stream.cast<ChipScanData>().asBroadcastStream();
 
-    final dyRfidLib = DynamicLibrary.open(dyRfidLibPath);
-    final InitPN532Dart initPN532 = 
-      dyRfidLib.lookupFunction<InitPN532, InitPN532Dart>('initPN532');
-    _getUidFunction = dyRfidLib.lookupFunction<GetUid, GetUidDart>('getUid');
-    
-    final initStatus = initPN532(_pn532Pointer);
-    
-    if (initStatus < 0) {
-      return Either.left(InitFailure()); 
-    }
-
-    _didInit = true;
-    return Either.right(unit);
+    _started = true;
   }
 
-  static Either<RfidFailure, ChipScanData> _getUid() {
-    assert(_didInit, "This RfidReader wasn't init yet!");
-    assert(!_closed, "This RfidReader instance was already closed!");
-
-    final int uidLength = _getUidFunction(_pn532Pointer, _dataArrPointer);
-
-    if (uidLength > 0) {
-      ChipScanDto dto = ChipScanDto.fromData(
-        dataArrPointer: _dataArrPointer, 
-        uidLength: uidLength
-      );
-      return Either.right(dto.toDomain());
-    }
-    return Either.left(NothingRead());
-  }
-
+  /// Provides the [ChipScanData] Stream. Keep in mind that when you actually 
+  /// want to receive events you have to call [startReadingFunction] after the 
+  /// future of [getUidStream] finishes!
   @override
   Future<Stream<ChipScanData>> getUidStream() async {
-    if (rfidReaderIsolate == null) {
-      ReceivePort receivePort = ReceivePort();
-      rootIsolateChannel = IsolateChannel.connectReceive(receivePort);
-      rfidReaderIsolate = await Isolate.spawn(_uidIsolate, receivePort.sendPort);
+    if (!_started) {
+      await startIsolate();
     }
 
-    return rootIsolateChannel!.stream.cast<ChipScanData>();
+    return _uidBroadcastStream!;
   }
 
   static void _uidIsolate(SendPort sendPort) {
+    final RfidReader rfidReader = RfidReader();
     final IsolateChannel isolateChannel = IsolateChannel.connectSend(sendPort);
-    Timer executionTimer = Timer(Duration.zero, () => _uidHelper(isolateChannel));
+    Timer? executionTimer;
 
-    isolateChannel.stream.cast<bool>().listen((event) {
-      if (event) { // when event is true = start execution
-        if (!executionTimer.isActive) { // when timer isn't active anymore reactivate
-          Timer(Duration.zero, () => _uidHelper(isolateChannel));
-        }
-      } else {
-        executionTimer.cancel();
+    Either<RfidFailure, Unit> initResult = rfidReader.initRfidReader();
+    initResult.fold(
+      (failure) { 
+        assert(false, "RFID init error! - Not a root user or something else?");
+      }, 
+      (unit) => null
+    );
+
+    isolateChannel.stream.cast<IsolateCommand>().listen((command) {
+      switch (command) {
+        case IsolateCommand.startReading:
+          if (executionTimer != null) {
+            if (!executionTimer!.isActive) {
+              executionTimer = Timer(
+                pauseBetweenScan, 
+                () => _uidHelper(isolateChannel, rfidReader)
+              );
+            }
+          } else {
+            executionTimer = Timer(
+              pauseBetweenScan, 
+              () => _uidHelper(isolateChannel, rfidReader)
+            );
+          }
+          break;
+
+        case IsolateCommand.stopReading:
+          if (executionTimer != null) {
+            executionTimer!.cancel();
+          } 
+          break;
+
+        case IsolateCommand.terminate:
+          rfidReader.closeRfidReader();
+          break;
       }
     });
   }
 
-  static void _uidHelper(IsolateChannel isolateChannel) {
-    Either<RfidFailure, ChipScanData> result = _getUid();
+  static void _uidHelper(IsolateChannel isolateChannel, RfidReader rfidReader) {
+    Either<RfidFailure, ChipScanData> result = rfidReader.getUid();
     
     result.fold(
       (rfidFailure) {
@@ -152,8 +149,8 @@ class ChipScanService extends ChipScanServiceInterface {
 
   @override
   Either<RfidFailure, Unit> pauseReadingFunction() {
-    if (rootIsolateChannel != null && rfidReaderIsolate != null) {
-      rootIsolateChannel!.sink.add(false);
+    if (_rootIsolateChannel != null && _rfidReaderIsolate != null) {
+      _rootIsolateChannel!.sink.add(IsolateCommand.stopReading);
       return Either.right(unit);
     }
 
@@ -161,9 +158,9 @@ class ChipScanService extends ChipScanServiceInterface {
   }
 
   @override
-  Either<RfidFailure, Unit> resumeReadingFunction() {
-    if (rootIsolateChannel != null && rfidReaderIsolate != null) {
-      rootIsolateChannel!.sink.add(true);
+  Either<RfidFailure, Unit> startReadingFunction() {
+    if (_rootIsolateChannel != null && _rfidReaderIsolate != null) {
+      _rootIsolateChannel!.sink.add(IsolateCommand.startReading);
       return Either.right(unit);
     }
 
@@ -172,17 +169,15 @@ class ChipScanService extends ChipScanServiceInterface {
 
 
   @override
-  void closeRfidReader() {
-    assert(_didInit, "This RfidReader wasn't init yet!");
-    assert(!_closed, "This RfidReader instance was already closed!");
+  void stopIsolate() {
+    assert(_started, "This RfidReader wasn't init yet!");
+    assert(!_stopped, "This RfidReader instance was already closed!");
 
-    calloc.free(_pn532Pointer);
-    calloc.free(_dataArrPointer);
-    rfidReaderIsolate?.kill();
-    _closed = true;
+    _rootIsolateChannel!.sink.add(IsolateCommand.terminate);
+    _rfidReaderIsolate?.kill();
+    _stopped = true;
   }
 }
-
 
 
 // Example Main to Test on Pi

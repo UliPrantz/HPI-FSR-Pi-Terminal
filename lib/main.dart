@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:terminal_frontend/injection_container.dart';
 import 'package:terminal_frontend/presentation/app_router.dart';
 
-void main() {
+void main() async {
 
 // TODO REMOVE
    WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +21,7 @@ void main() {
   }
 // TODO END
 
-  InjectionContainer.injectDependencies();
+  await InjectionContainer.injectDependencies();
   runApp(WalletTerminalApp());
 }
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:get_it/get_it.dart';
+import 'package:terminal_frontend/application/start_screen/start_screen_cubit.dart';
 
 import 'package:terminal_frontend/presentation/app_router.dart';
 import 'package:terminal_frontend/presentation/core/app_bar_button.dart';
@@ -35,8 +37,8 @@ class FsrWalletAppBar extends AppBar {
 
             const Spacer(),
 
-            const Text(
-              "FSR Wallet",
+            Text(
+              GetIt.I<StartScreenCubit>().state.terminalMetaData.name,
               style: TextStyles.appBarText
             ),
             

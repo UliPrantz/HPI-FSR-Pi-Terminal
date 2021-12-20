@@ -32,7 +32,7 @@ class DigitContainer extends StatelessWidget {
       child: Center(
         child: Text(
           digit,
-          style: TextStyles.normalTextBlack,
+          style: TextStyles.normalTextBlackBold,
         ),
       ),
     );

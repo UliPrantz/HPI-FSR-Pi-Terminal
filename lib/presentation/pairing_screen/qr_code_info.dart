@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:terminal_frontend/presentation/core/styles/text_styles.dart';
+import 'package:terminal_frontend/presentation/core/styles/styles.dart';
 
 class QrCodeInfo extends StatelessWidget {
   static const String pairingEndpoint = "/pos/wallets/token/";

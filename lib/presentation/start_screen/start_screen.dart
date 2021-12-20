@@ -21,8 +21,8 @@ class StartScreen extends StatelessWidget {
       bloc: GetIt.I<StartScreenCubit>(),
       listener: (context, state) {
         if (state.loadingState == LoadingState.loadingSucceeded) {
-          //AutoRouter.of(context).replace(ChipScanScreenRoute()); TODO change
-          AutoRouter.of(context).push(ShopScreenRoute(items: state.terminalMetaData.items, tag: "coffee", tokenId: "4c12121212124c"));
+          AutoRouter.of(context).replace(ChipScanScreenRoute());
+          // TODO remove AutoRouter.of(context).push(ShopScreenRoute(items: state.terminalMetaData.items, tag: "coffee", tokenId: "4c12121212124c"));
         }
       },
       builder: (context, state) {

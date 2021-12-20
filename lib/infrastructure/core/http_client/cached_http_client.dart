@@ -14,7 +14,7 @@ class CachedHttpClient {
   static final CachedHttpClient _instance = CachedHttpClient._internal();
 
   Uri? _host;
-  Map<String, String>? _headers;
+  Map<String, String>? _clientHeaders;
   http.Client? _innerClient;
 
   Timer? retryTimer;
@@ -27,7 +27,7 @@ class CachedHttpClient {
   }) {
     _instance._innerClient ??= innerClient;
     _instance._host ??= uri;
-    _instance._headers ??= headers;
+    _instance._clientHeaders ??= headers;
     return _instance;
   }
   CachedHttpClient._internal();
@@ -71,7 +71,7 @@ class CachedHttpClient {
   Future<Response> _sendUnstreamed(
       String method, 
       String endpoint, 
-      Map<String, String>? headers,
+      Map<String, String>? requestHeaders,
       bool retry,
       [body, Encoding? encoding]) async {
     final Uri url = Uri(
@@ -81,8 +81,8 @@ class CachedHttpClient {
     );
     var request = http.Request(method, url);
 
-    if (headers != null) request.headers.addAll(headers);
-    if (_headers!.isNotEmpty) request.headers.addAll(_headers!);
+    if (requestHeaders != null) request.headers.addAll(requestHeaders);
+    if (_clientHeaders!.isNotEmpty) request.headers.addAll(_clientHeaders!);
     if (encoding != null) request.encoding = encoding;
     if (body != null) {
       if (body is String) {
@@ -117,11 +117,16 @@ class CachedHttpClient {
   }
 
   Future<http.StreamedResponse> send(http.BaseRequest request, bool retry) async {
+    // this is needed since inside of send finalize is called on request which
+    // can't be undone! Therefore we have to copy the request first which isn't
+    // trivial and sometimes not even possible (for StreamedRequests e.g.)
+    final notFinalizedRequest = _copyRequest(request);
+
     try {
-      return _innerClient!.send(request);
-    } on http.ClientException {
+      return await _innerClient!.send(request);
+    } catch (e) {
       if (retry) {
-        failedRequests.add(request);
+        failedRequests.add(notFinalizedRequest);
         
         // if a timer is already active reset it
         if (retryTimer != null) {
@@ -133,15 +138,49 @@ class CachedHttpClient {
     }
   }
   
-  void periodicRetry(Timer timer) {
+  void periodicRetry(Timer timer) async {
     // cancel the time since out would be reactivated if any request fails
     timer.cancel();
 
     List<http.BaseRequest> tmpFailedRequests = List.from(failedRequests);
     failedRequests.clear();
 
-    for (http.BaseRequest request in tmpFailedRequests) { 
-      send(request, true);
+    for (http.BaseRequest request in tmpFailedRequests) {
+      try {
+        await send(request, true);
+      } catch (e) {
+        // nothing we want to do here
+      }
+      
     }
+  }
+
+  http.BaseRequest _copyRequest(http.BaseRequest request) {
+    http.BaseRequest requestCopy;
+
+    if(request is http.Request) {
+      requestCopy = http.Request(request.method, request.url)
+        ..encoding = request.encoding
+        ..bodyBytes = request.bodyBytes;
+    }
+    else if(request is http.MultipartRequest) {
+      requestCopy = http.MultipartRequest(request.method, request.url)
+        ..fields.addAll(request.fields)
+        ..files.addAll(request.files);
+    }
+    else if(request is http.StreamedRequest) {
+      throw Exception('copying streamed requests is not supported');
+    }
+    else {
+      throw Exception('request type is unknown, cannot copy');
+    }
+
+    requestCopy
+      ..persistentConnection = request.persistentConnection
+      ..followRedirects = request.followRedirects
+      ..maxRedirects = request.maxRedirects
+      ..headers.addAll(request.headers);
+
+    return requestCopy;
   }
 }

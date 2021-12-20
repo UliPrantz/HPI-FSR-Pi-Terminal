@@ -6,7 +6,7 @@ import 'package:get_it/get_it.dart';
 
 import 'package:terminal_frontend/application/chip_scan/chip_scan_cubit.dart';
 import 'package:terminal_frontend/application/chip_scan/chip_scan_state.dart';
-import 'package:terminal_frontend/domain/terminal_meta_data/terminal_meta_data.dart';
+import 'package:terminal_frontend/application/start_screen/start_screen_cubit.dart';
 import 'package:terminal_frontend/infrastructure/chip_scan/chip_scan_service.dart';
 import 'package:terminal_frontend/presentation/app_router.dart';
 import 'package:terminal_frontend/presentation/core/app_bar.dart';
@@ -17,9 +17,7 @@ class ChipScanScreen extends StatelessWidget {
     chipScanService: GetIt.I<ChipScanService>()
   );
 
-  ChipScanScreen({ Key? key }) : super(key: key) {
-    chipScanCubit.resumeListingForChipData();
-  }
+  ChipScanScreen({ Key? key }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +30,7 @@ class ChipScanScreen extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 12.0),
           child: Center(
             child: Text(
-              "Bitte den Transponder an das Lesegerät halten",
+              "Please put your transponder in front of the reader",
               style: TextStyles.mainTextBig,
               textAlign: TextAlign.center
             ),
@@ -45,10 +43,11 @@ class ChipScanScreen extends StatelessWidget {
   void _chipScanStateChanged(BuildContext context, ChipScanState state) {
     if (state.chipDataAvailable) {
       chipScanCubit.stopListingForChipData();
+
       AutoRouter.of(context).push(
         ShopScreenRoute(
           tokenId: state.chipScanData.uuid,
-          items: GetIt.I<TerminalMetaData>().items,
+          items: GetIt.I<StartScreenCubit>().state.terminalMetaData.items,
           tag: "coffee"
         )
       );

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:terminal_frontend/application/shopping/shopping_cubit.dart';
 import 'package:terminal_frontend/application/shopping/shopping_state.dart';
 import 'package:terminal_frontend/presentation/core/format_extensions.dart';
+import 'package:terminal_frontend/presentation/core/styles/styles.dart';
 import 'package:terminal_frontend/presentation/shop_screen/checkout_preview_button.dart';
 
 class CheckoutPreview extends StatelessWidget {
@@ -30,10 +31,12 @@ class CheckoutPreview extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      "Summe",
+                      "Purchase amount:",
+                      style: TextStyles.normalTextBlackBold,
                     ),
                     Text(
-                      state.shoppingData.purchaseCost.toEuroString()
+                      state.shoppingData.purchaseCost.toEuroString(),
+                      style: TextStyles.normalTextBlackBold,
                     )
                   ],
                 ),
@@ -51,7 +54,8 @@ class CheckoutPreview extends StatelessWidget {
                     ),
 
                     CheckoutPreviewButton(
-                      callback: () => _checkout(context), 
+                      callback: state.shoppingData.overallItemCount > 0 ?
+                          () => _checkout(context) : null, 
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

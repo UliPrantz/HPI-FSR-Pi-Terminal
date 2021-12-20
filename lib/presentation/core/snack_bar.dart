@@ -17,6 +17,7 @@ void showSnackBar({required GlobalKey<ScaffoldState> scaffoldKey, required Strin
     ),
   );
 
+  scaffoldMessenger.clearSnackBars();
   scaffoldMessenger.showSnackBar(snackBar);
 }
 

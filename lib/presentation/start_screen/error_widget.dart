@@ -14,7 +14,7 @@ class ErrorWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Text(
-            "Failed to connect to backend\nProbably couldn't reach ther server or couldn't authenticate",
+            "Failed to connect to backend\nProbably couldn't reach the server or couldn't authenticate",
             textAlign: TextAlign.center,
             style: TextStyles.errorTextStyle,
           ),

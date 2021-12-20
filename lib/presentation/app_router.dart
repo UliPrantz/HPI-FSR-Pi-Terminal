@@ -16,7 +16,10 @@ part 'app_router.gr.dart'; // .gr.dart is needed (doesn't work with .g.dart)
 @MaterialAutoRouter(     
   routes: <AutoRoute>[        
     AutoRoute(page: StartScreen, initial: true),
-    AutoRoute(page: ChipScanScreen),
+    CustomRoute(
+      page: ChipScanScreen,
+      transitionsBuilder: TransitionsBuilders.fadeIn
+    ),
     AutoRoute(page: ShopScreen),
     AutoRoute<User>(page: PairingScreen),            
     AutoRoute(page: CheckoutScreen),

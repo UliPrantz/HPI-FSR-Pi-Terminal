@@ -41,6 +41,11 @@ class TextStyles {
     fontWeight: FontWeight.w400,
   );
 
+  static const TextStyle normalTextBlackBold = TextStyle(
+    color: AppColors.black,
+    fontWeight: FontWeight.bold,
+  );
+
   static const TextStyle mainTextBig = TextStyle(
     color: AppColors.darkGrey,
     fontSize: 30.0,

@@ -24,7 +24,7 @@ class BalanceView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  "Ihr Guthaben:",
+                  "Your Balance:",
                   style: TextStyles.mainTextBig,
                   textAlign: TextAlign.center,
                 ),

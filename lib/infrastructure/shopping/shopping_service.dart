@@ -21,7 +21,6 @@ class ShoppingService extends ShoppingServiceInterface {
   @override
   Future<Either<HttpFailure, Unit>> sendCheckoutTransaction(ShoppingData shoppingData, String tokenId) async {
     final String uri = "$endpointStart$tokenId$endpointEnd";
-    shoppingData.copyWith(transactionDescription: "adsfasdf");
     final String body = jsonEncode(ShoppingDto.fromDomain(shoppingData: shoppingData));
     
     Response response;

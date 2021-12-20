@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:terminal_frontend/presentation/core/styles/text_styles.dart';
+import 'package:terminal_frontend/presentation/core/styles/styles.dart';
 
 class LoadingWidget extends StatefulWidget {
   const LoadingWidget({ Key? key }) : super(key: key);

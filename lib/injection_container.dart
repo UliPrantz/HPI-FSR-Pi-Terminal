@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart' show WidgetsFlutterBinding;
-import 'package:flutter/services.dart' show rootBundle;
+import 'dart:io';
 
+import 'package:fpdart/fpdart.dart';
 import 'package:yaml/yaml.dart';
-
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:terminal_frontend/domain/core/basic_failures.dart';
 import 'package:terminal_frontend/application/start_screen/start_screen_cubit.dart';
 import 'package:terminal_frontend/infrastructure/chip_scan/chip_scan_service.dart';
 import 'package:terminal_frontend/infrastructure/core/http_client/http_client.dart';
@@ -22,7 +22,7 @@ class EnvironmentConfig {
 }
 
 class InjectionContainer {
-  static const String envPath = 'assets/env.yaml';
+  static const String envPath = '/Users/Uli/Desktop/terminal_frontend/assets/env.yaml';
   static const String envKey = 'environment';
   static const String schemeKey = 'scheme';
   static const String hostKey = 'host_name';
@@ -33,7 +33,7 @@ class InjectionContainer {
 
   /// This function loads all the neccassyry config variable defined in env.yaml.
   /// The return type is dynamic since at this point the official yaml package
-  /// returns some on Map implementation but in future will only support HashMap.
+  /// returns some own Map implementation but in future will only support HashMap.
   /// In general the return type should support normal map functionality, so just
   /// treat it like a map.
   /// 
@@ -46,12 +46,11 @@ class InjectionContainer {
   ///   host_name: "SomePrettyLongToken"
   /// -----End example 'env.yaml'-----
   static Future<EnvironmentConfig> _getEnvConfig() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    // final String confYaml = await rootBundle.loadString(envPath);
-    // final configMap = loadYaml(confYaml);
+    final String confYaml = await File(envPath).readAsString();
+    final configMap = loadYaml(confYaml);
 
     // TODO remove it
-    final configMap = {envKey: {schemeKey:"https", hostKey: "hpi-wallet-backend.test", terminalTokenKey: "47umEV6vcla51g40rfvW6cvwQfP36m7nSNMElBtD"}};
+    //final configMap = {envKey: {schemeKey:"https", hostKey: "hpi-wallet-backend.test", terminalTokenKey: "47umEV6vcla51g40rfvW6cvwQfP36m7nSNMElBtD"}};
     // end remove it
 
     final envConfigs = configMap[envKey]!;
@@ -72,8 +71,11 @@ class InjectionContainer {
       'Authorization' : 'Bearer ${envConfig.authToken}',
       'content-type' : 'application/json',
     };
-    final CachedHttpClient httpClient = 
-      CachedHttpClient(innerClient: http.Client(), uri: envConfig.serverUri, headers: headers);
+    final CachedHttpClient httpClient = CachedHttpClient(
+      innerClient: http.Client(), 
+      uri: envConfig.serverUri, 
+      headers: headers
+    );
 
     getIt.registerSingleton(envConfig);
 

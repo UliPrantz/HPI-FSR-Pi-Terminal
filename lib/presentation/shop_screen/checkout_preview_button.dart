@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CheckoutPreviewButton extends StatelessWidget {
-  final VoidCallback callback;
+  final VoidCallback? callback;
   final Widget child;
 
   const CheckoutPreviewButton({
