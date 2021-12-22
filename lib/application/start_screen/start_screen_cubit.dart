@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:bloc/bloc.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:terminal_frontend/application/start_screen/start_screen_state.dart';
@@ -31,6 +33,24 @@ class StartScreenCubit extends Cubit<StartScreenState> {
         );
         emit(newState);
       });
+  }
+
+  void updateTerminalMetaData() async {
+    Either<HttpFailure, TerminalMetaData> result = 
+      await terminalMetaDataService.getTerminalInfo();
+
+      result.fold(
+        (failure) {
+          // nothing to do here just ignore it (because we just updating)
+        },
+         (result) {
+           emit(
+             state.copyWith(
+               terminalMetaData: result
+             )
+           );
+         }
+      );
   }
 
   void retry() {

@@ -2,10 +2,12 @@ import 'dart:ffi';
 
 import 'package:fpdart/fpdart.dart';
 import 'package:ffi/ffi.dart';
+import 'package:get_it/get_it.dart';
 
 import 'package:terminal_frontend/domain/chip_scan/chip_scan_data.dart';
 import 'package:terminal_frontend/domain/core/basic_failures.dart';
 import 'package:terminal_frontend/infrastructure/chip_scan/chip_scan_dto.dart';
+import 'package:terminal_frontend/injection_container.dart';
 
 
 // At the bottom there also is a dart cli example for the Pi
@@ -51,9 +53,9 @@ typedef GetUidDart = int Function(Pointer<PN532> pn532, Pointer<Uint8> data);
 
 
 class RfidReader {
-  static const String dyRfidLibPath = "/Users/Uli/Desktop/terminal_frontend/assets/rfid_lib/src/debug.dylib";
   static const int uidMaxLength = 10;
-
+  final String dyRfidLibPath;
+  
   bool _didInit = false;
   bool _closed = false;
 
@@ -62,10 +64,8 @@ class RfidReader {
 
   late final GetUidDart _getUidFunction;
   
-  /// This class must be called before the RfidReader can be used!
-  /// There is no underlying class RfidReader since it would be completely obsolete.
-  /// Such a class could be added later.
-  /// 
+  RfidReader({required this. dyRfidLibPath});
+
   /// @throws DynamicLibrary.open() and the .lookup function can throw!
   ///         These errors aren't handeled for a good reason. If this happens
   ///         the provided driver C library is broken or couldn't be found. 

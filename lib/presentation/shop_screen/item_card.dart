@@ -2,14 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import 'package:get_it/get_it.dart';
+
 import 'package:terminal_frontend/application/shopping/shopping_cubit.dart';
 import 'package:terminal_frontend/domain/terminal_meta_data/item.dart';
+import 'package:terminal_frontend/injection_container.dart';
 import 'package:terminal_frontend/presentation/core/format_extensions.dart';
 import 'package:terminal_frontend/presentation/core/styles/styles.dart';
 import 'package:terminal_frontend/presentation/shop_screen/item_count.dart';
 
 class ItemCard extends StatelessWidget {
-  final File coffeeMugFile = File("/Users/Uli/Desktop/terminal_frontend/assets/icons/coffee-mug.png");
+  final File coffeeMugFile = File(GetIt.I<EnvironmentConfig>().coffeeImgPath);
   final ShoppingCubit shoppingCubit;
   final Item item;
 

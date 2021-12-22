@@ -1,11 +1,9 @@
 import 'dart:io';
 
-import 'package:fpdart/fpdart.dart';
 import 'package:yaml/yaml.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:terminal_frontend/domain/core/basic_failures.dart';
 import 'package:terminal_frontend/application/start_screen/start_screen_cubit.dart';
 import 'package:terminal_frontend/infrastructure/chip_scan/chip_scan_service.dart';
 import 'package:terminal_frontend/infrastructure/core/http_client/http_client.dart';
@@ -17,12 +15,23 @@ import 'package:terminal_frontend/infrastructure/user/user_serivce.dart';
 class EnvironmentConfig {
   final Uri serverUri;
   final String authToken;
+  
+  final String coffeeImgPath;
+  final String rfidDyLibPath;
 
-  const EnvironmentConfig({required this.serverUri, required this.authToken});
+  const EnvironmentConfig({
+    required this.serverUri, 
+    required this.authToken,
+    required this.coffeeImgPath,
+    required this.rfidDyLibPath,
+  });
 }
 
 class InjectionContainer {
-  static const String envPath = '/Users/Uli/Desktop/terminal_frontend/assets/env.yaml';
+  static const String envRelativPath = 'assets/env.yaml';
+  static const String coffeeImgRelativPath = 'assets/icons/coffee-mug.png';
+  static const String rfidDyLibRelativPath = 'assets/rfid_lib/rfid_lib.so';
+
   static const String envKey = 'environment';
   static const String schemeKey = 'scheme';
   static const String hostKey = 'host_name';
@@ -46,12 +55,13 @@ class InjectionContainer {
   ///   host_name: "SomePrettyLongToken"
   /// -----End example 'env.yaml'-----
   static Future<EnvironmentConfig> _getEnvConfig() async {
-    final String confYaml = await File(envPath).readAsString();
-    final configMap = loadYaml(confYaml);
+    final Uri currentDir = Directory.current.uri;
+    final Uri envUri = Uri(path: "${currentDir.path}$envRelativPath");
+    final Uri coffeeImgUri = Uri(path: "${currentDir.path}$coffeeImgRelativPath");
+    final Uri rfidDyLibUri = Uri(path: "${currentDir.path}$rfidDyLibRelativPath");
 
-    // TODO remove it
-    //final configMap = {envKey: {schemeKey:"https", hostKey: "hpi-wallet-backend.test", terminalTokenKey: "47umEV6vcla51g40rfvW6cvwQfP36m7nSNMElBtD"}};
-    // end remove it
+    final String confYaml = await File(envUri.toFilePath()).readAsString();
+    final configMap = loadYaml(confYaml);
 
     final envConfigs = configMap[envKey]!;
 
@@ -60,7 +70,10 @@ class InjectionContainer {
         scheme: envConfigs[schemeKey]!, 
         host: envConfigs[hostKey]!
       ), 
-      authToken: envConfigs[terminalTokenKey]!
+      authToken: envConfigs[terminalTokenKey]!,
+
+      coffeeImgPath: coffeeImgUri.toFilePath(),
+      rfidDyLibPath: rfidDyLibUri.toFilePath(),
     );
   }
 
@@ -79,7 +92,7 @@ class InjectionContainer {
 
     getIt.registerSingleton(envConfig);
 
-    getIt.registerSingleton(ChipScanService());
+    getIt.registerSingleton(ChipScanService(rfidDyLibPath: envConfig.rfidDyLibPath));
     getIt.registerSingleton(PairingService(httpClient: httpClient));
     getIt.registerSingleton(ShoppingService(httpClient: httpClient));
     getIt.registerSingleton(TerminalMetaDataService(httpClient: httpClient));

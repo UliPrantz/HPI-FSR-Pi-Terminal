@@ -8,7 +8,6 @@ import 'package:stream_channel/isolate_channel.dart';
 import 'package:terminal_frontend/domain/chip_scan/chip_scan_data.dart';
 import 'package:terminal_frontend/domain/chip_scan/chip_scan_service_interface.dart';
 import 'package:terminal_frontend/domain/core/basic_failures.dart';
-import 'package:terminal_frontend/infrastructure/chip_scan/chip_scan_dto.dart';
 import 'package:terminal_frontend/infrastructure/chip_scan/rfid_reader.dart';
 
 // At the bottom there also is a dart cli example for the Pi
@@ -51,14 +50,32 @@ typedef InitPN532Dart = int Function(Pointer<PN532> pn532);
 typedef GetUid = Int32 Function(Pointer<PN532> pn532, Pointer<Uint8> data);
 typedef GetUidDart = int Function(Pointer<PN532> pn532, Pointer<Uint8> data);
 
-enum IsolateCommand {
+enum IsolateCommandType {
+  pathInformation,
   startReading,
   stopReading,
-  terminate
+  terminate,
+}
+
+class IsolateCommand {
+  final IsolateCommandType type;
+  final String dyLibPath;
+
+  IsolateCommand({required this.type, this.dyLibPath=""});
+
+  IsolateCommand copyWith({
+    IsolateCommandType? type,
+    String? dyLibPath,
+  }) => IsolateCommand(
+    type: type ?? this.type,
+    dyLibPath: dyLibPath ?? this.dyLibPath
+  );
 }
 
 class ChipScanService extends ChipScanServiceInterface {
   static const Duration pauseBetweenScan = Duration(seconds: 1);
+
+  final String rfidDyLibPath;
 
   bool _started = false;
   bool _stopped = false;
@@ -68,12 +85,22 @@ class ChipScanService extends ChipScanServiceInterface {
 
   Stream<ChipScanData>? _uidBroadcastStream;
 
+  ChipScanService({required this.rfidDyLibPath});
+
   @override
   Future<void> startIsolate() async {
     ReceivePort receivePort = ReceivePort();
     _rootIsolateChannel = IsolateChannel.connectReceive(receivePort);
     _rfidReaderIsolate = await Isolate.spawn(_uidIsolate, receivePort.sendPort);
     _uidBroadcastStream = _rootIsolateChannel!.stream.cast<ChipScanData>().asBroadcastStream();
+    
+    // send the dyLibPath to the isolate as first event
+    _rootIsolateChannel!.sink.add(
+      IsolateCommand(
+        type: IsolateCommandType.pathInformation,
+        dyLibPath: rfidDyLibPath,
+      )
+    );
 
     _started = true;
   }
@@ -91,21 +118,19 @@ class ChipScanService extends ChipScanServiceInterface {
   }
 
   static void _uidIsolate(SendPort sendPort) {
-    final RfidReader rfidReader = RfidReader();
+    late final RfidReader rfidReader;
     final IsolateChannel isolateChannel = IsolateChannel.connectSend(sendPort);
     Timer? executionTimer;
 
-    Either<RfidFailure, Unit> initResult = rfidReader.initRfidReader();
-    initResult.fold(
-      (failure) { 
-        assert(false, "RFID init error! - Not a root user or something else?");
-      }, 
-      (unit) => null
-    );
+
 
     isolateChannel.stream.cast<IsolateCommand>().listen((command) {
-      switch (command) {
-        case IsolateCommand.startReading:
+      switch (command.type) {
+        case IsolateCommandType.pathInformation:
+          rfidReader = _getRfidReader(command.dyLibPath);
+          break;
+
+        case IsolateCommandType.startReading:
           if (executionTimer != null) {
             if (!executionTimer!.isActive) {
               executionTimer = Timer(
@@ -121,17 +146,31 @@ class ChipScanService extends ChipScanServiceInterface {
           }
           break;
 
-        case IsolateCommand.stopReading:
+        case IsolateCommandType.stopReading:
           if (executionTimer != null) {
             executionTimer!.cancel();
           } 
           break;
 
-        case IsolateCommand.terminate:
+        case IsolateCommandType.terminate:
           rfidReader.closeRfidReader();
           break;
       }
     });
+  }
+
+  static RfidReader _getRfidReader(String dyLibPath) {
+    final RfidReader rfidReader = RfidReader(dyRfidLibPath: dyLibPath);
+    Either<RfidFailure, Unit> initResult = rfidReader.initRfidReader();
+
+    initResult.fold(
+      (failure) { 
+        assert(false, "RFID init error! - Not a root user or something else?");
+      }, 
+      (unit) => null
+    );
+
+    return rfidReader;
   }
 
   static void _uidHelper(IsolateChannel isolateChannel, RfidReader rfidReader) {
@@ -148,9 +187,9 @@ class ChipScanService extends ChipScanServiceInterface {
   }
 
   @override
-  Either<RfidFailure, Unit> pauseReadingFunction() {
+  Either<RfidFailure, Unit> stopReadingFunction() {
     if (_rootIsolateChannel != null && _rfidReaderIsolate != null) {
-      _rootIsolateChannel!.sink.add(IsolateCommand.stopReading);
+      _rootIsolateChannel!.sink.add(IsolateCommand(type: IsolateCommandType.stopReading));
       return Either.right(unit);
     }
 
@@ -160,7 +199,7 @@ class ChipScanService extends ChipScanServiceInterface {
   @override
   Either<RfidFailure, Unit> startReadingFunction() {
     if (_rootIsolateChannel != null && _rfidReaderIsolate != null) {
-      _rootIsolateChannel!.sink.add(IsolateCommand.startReading);
+      _rootIsolateChannel!.sink.add(IsolateCommand(type: IsolateCommandType.startReading));
       return Either.right(unit);
     }
 
@@ -169,11 +208,11 @@ class ChipScanService extends ChipScanServiceInterface {
 
 
   @override
-  void stopIsolate() {
+  void terminateIsolate() {
     assert(_started, "This RfidReader wasn't init yet!");
     assert(!_stopped, "This RfidReader instance was already closed!");
 
-    _rootIsolateChannel!.sink.add(IsolateCommand.terminate);
+    _rootIsolateChannel!.sink.add(IsolateCommand(type: IsolateCommandType.terminate));
     _rfidReaderIsolate?.kill();
     _stopped = true;
   }

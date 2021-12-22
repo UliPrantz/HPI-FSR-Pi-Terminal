@@ -13,15 +13,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # TODO Test 
-
-  window_size:
-    git:
-      url: git://github.com/google/flutter-desktop-embedding.git
-      path: plugins/window_size
-
-  # End Test
-
   qr_flutter: ^4.0.0
 
   auto_route: ^3.1.3
