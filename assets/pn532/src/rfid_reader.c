@@ -3,7 +3,7 @@
 #include <time.h>
 #include "pn532.h"
 #include "pn532_rpi.h"
-
+#include "rfid_reader.h"
 
 // init the pn532
 //
@@ -30,24 +30,3 @@ int8_t initPN532(PN532 *pn532) {
 int32_t getUid(PN532 *pn532, uint8_t data[MIFARE_UID_MAX_LENGTH]) {
     return PN532_ReadPassiveTarget(pn532, data, PN532_MIFARE_ISO14443A, 1000);
 }
-
-
-// example main to see how these functions are called!
-// int main() {
-//     PN532 pn532;
-//     uint8_t data[MIFARE_UID_MAX_LENGTH];
-
-//     initPN532(&pn532);
-
-//     while (1) {
-//         int32_t uid_len = getUid(&pn532, data);
-
-//         if (uid_len > 0) {
-//             printf("\n0x");
-//             for (uint8_t i = 0; i < uid_len; i++)
-//                 printf("%02x ", data[i]);
-//             printf("\n");
-//             break;
-//         }
-//     }
-// }

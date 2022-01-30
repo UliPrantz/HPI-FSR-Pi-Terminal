@@ -33,7 +33,7 @@ int32_t getUid(PN532 *pn532, uint8_t data[10]) {
 
 
 int main() {
-    initPN532(NULL);
+    initPN532(NULL); //
     uint8_t data[10];
     getUid(NULL, data);
 

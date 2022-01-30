@@ -30,7 +30,7 @@ class EnvironmentConfig {
 class InjectionContainer {
   static const String envRelativPath = 'assets/env.yaml';
   static const String coffeeImgRelativPath = 'assets/icons/coffee-mug.png';
-  static const String rfidDyLibRelativPath = 'assets/rfid_lib/rfid_lib.so';
+  static const String rfidDyLibRelativPath = 'assets/pn532/build/librfid.so';
 
   static const String envKey = 'environment';
   static const String schemeKey = 'scheme';
