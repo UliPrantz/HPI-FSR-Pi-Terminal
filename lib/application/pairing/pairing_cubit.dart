@@ -1,9 +1,7 @@
 import "package:bloc/bloc.dart";
 import 'package:fpdart/fpdart.dart';
 
-import 'package:terminal_frontend/application/chip_scan/chip_scan_cubit.dart';
 import 'package:terminal_frontend/application/pairing/pairing_state.dart';
-import 'package:terminal_frontend/application/shopping/shopping_cubit.dart';
 import 'package:terminal_frontend/domain/core/basic_failures.dart';
 import 'package:terminal_frontend/domain/pairing/pairing_service_interface.dart';
 import 'package:terminal_frontend/domain/user/user.dart';

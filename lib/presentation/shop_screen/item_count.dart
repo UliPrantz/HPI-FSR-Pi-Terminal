@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:terminal_frontend/presentation/core/styles/colors.dart';
 import 'package:terminal_frontend/presentation/core/styles/styles.dart';
 
 class ItemCount extends StatelessWidget {

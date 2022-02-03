@@ -6,7 +6,6 @@ import 'package:auto_route/auto_route.dart';
 import "package:bloc/bloc.dart";
 import 'package:fpdart/fpdart.dart';
 
-import 'package:terminal_frontend/application/chip_scan/chip_scan_cubit.dart';
 import 'package:terminal_frontend/application/shopping/shopping_state.dart';
 import 'package:terminal_frontend/domain/core/basic_failures.dart';
 import 'package:terminal_frontend/domain/shopping/shopping_data.dart';
@@ -15,7 +14,6 @@ import 'package:terminal_frontend/domain/terminal_meta_data/item.dart';
 import 'package:terminal_frontend/domain/user/user.dart';
 import 'package:terminal_frontend/domain/user/user_service_interface.dart';
 import 'package:terminal_frontend/presentation/app_router.dart';
-import 'package:terminal_frontend/presentation/checkout_screen/checkout_screen.dart';
 
 class ShoppingCubit extends Cubit<ShoppingState> {
   static const int secondsToShowCheckoutScreen = 3;

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
 
 import 'package:terminal_frontend/domain/terminal_meta_data/item.dart';
@@ -18,7 +17,7 @@ part 'app_router.gr.dart'; // .gr.dart is needed (doesn't work with .g.dart)
     AutoRoute(page: StartScreen, initial: true),
     CustomRoute(
       page: ChipScanScreen,
-      transitionsBuilder: TransitionsBuilders.fadeIn
+      transitionsBuilder: TransitionsBuilders.fadeIn,
     ),
     AutoRoute(page: ShopScreen),
     AutoRoute<User>(page: PairingScreen),            

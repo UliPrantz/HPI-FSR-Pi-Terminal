@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:fpdart/fpdart.dart';
 
 import 'package:terminal_frontend/domain/core/basic_failures.dart';

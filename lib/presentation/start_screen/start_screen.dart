@@ -6,7 +6,6 @@ import 'package:get_it/get_it.dart';
 
 import 'package:terminal_frontend/application/start_screen/start_screen_cubit.dart';
 import 'package:terminal_frontend/application/start_screen/start_screen_state.dart';
-import 'package:terminal_frontend/infrastructure/terminal_meta_data/terminal_meta_data_service.dart';
 import 'package:terminal_frontend/presentation/app_router.dart';
 import 'package:terminal_frontend/presentation/core/styles/styles.dart';
 import 'package:terminal_frontend/presentation/start_screen/error_widget.dart';

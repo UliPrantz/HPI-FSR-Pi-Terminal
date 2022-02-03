@@ -5,7 +5,6 @@ import 'package:fpdart/fpdart.dart';
 import 'package:terminal_frontend/domain/shopping/shopping_data.dart';
 import 'package:terminal_frontend/domain/core/basic_failures.dart';
 import 'package:terminal_frontend/domain/shopping/shopping_service_interface.dart';
-import 'package:terminal_frontend/infrastructure/core/http_client/cached_http_client.dart';
 import 'package:terminal_frontend/infrastructure/core/http_client/http_client.dart';
 import 'package:terminal_frontend/infrastructure/shopping/shopping_dto.dart';
 
