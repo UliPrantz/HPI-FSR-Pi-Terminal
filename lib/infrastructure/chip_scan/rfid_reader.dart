@@ -2,12 +2,10 @@ import 'dart:ffi';
 
 import 'package:fpdart/fpdart.dart';
 import 'package:ffi/ffi.dart';
-import 'package:get_it/get_it.dart';
 
 import 'package:terminal_frontend/domain/chip_scan/chip_scan_data.dart';
 import 'package:terminal_frontend/domain/core/basic_failures.dart';
 import 'package:terminal_frontend/infrastructure/chip_scan/chip_scan_dto.dart';
-import 'package:terminal_frontend/injection_container.dart';
 
 
 // At the bottom there also is a dart cli example for the Pi
@@ -103,6 +101,7 @@ class RfidReader {
         dataArrPointer: _dataArrPointer, 
         uidLength: uidLength
       );
+
       return Either.right(dto.toDomain());
     }
     return Either.left(NothingRead());

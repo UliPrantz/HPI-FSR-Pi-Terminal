@@ -122,8 +122,6 @@ class ChipScanService extends ChipScanServiceInterface {
     final IsolateChannel isolateChannel = IsolateChannel.connectSend(sendPort);
     Timer? executionTimer;
 
-
-
     isolateChannel.stream.cast<IsolateCommand>().listen((command) {
       switch (command.type) {
         case IsolateCommandType.pathInformation:
@@ -131,19 +129,16 @@ class ChipScanService extends ChipScanServiceInterface {
           break;
 
         case IsolateCommandType.startReading:
-          if (executionTimer != null) {
-            if (!executionTimer!.isActive) {
-              executionTimer = Timer(
+          // if excution (timer is null) OR (it isn't null AND not active) => activate it
+          if (
+            (executionTimer == null) || 
+            (executionTimer != null && !executionTimer!.isActive)) {
+
+              executionTimer = Timer.periodic(
                 pauseBetweenScan, 
-                () => _uidHelper(isolateChannel, rfidReader)
+                (timer) => _uidHelper(isolateChannel, rfidReader)
               );
             }
-          } else {
-            executionTimer = Timer(
-              pauseBetweenScan, 
-              () => _uidHelper(isolateChannel, rfidReader)
-            );
-          }
           break;
 
         case IsolateCommandType.stopReading:
@@ -175,13 +170,20 @@ class ChipScanService extends ChipScanServiceInterface {
 
   static void _uidHelper(IsolateChannel isolateChannel, RfidReader rfidReader) {
     Either<RfidFailure, ChipScanData> result = rfidReader.getUid();
-    
+
     result.fold(
       (rfidFailure) {
         // nothing we can do here - just skip
       }, 
-      (chipScanData) {
+      (chipScanData) async {
         isolateChannel.sink.add(chipScanData);
+
+        // Adding a delay in case of a successfull read so we don't read twice
+        // and even more important we give the applicaiton layer some time to
+        // react. This is good because when it interrupts an active read it can
+        // happen that we get an dangling pointer which causes an
+        // `corrupted size vs. prev_size flutter` error
+        await Future.delayed(const Duration(seconds: 2));
       }
     );
   }
