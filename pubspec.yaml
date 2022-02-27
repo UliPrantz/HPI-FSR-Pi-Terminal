@@ -28,6 +28,7 @@ dependencies:
 
   stream_channel: ^2.1.0
   ffi: ^1.1.2
+  dart_periphery: ^0.8.25-RC
 
 
 dev_dependencies:
@@ -48,6 +49,6 @@ flutter:
 
   assets:
     - assets/icons/coffee-mug.png
-    - assets/pn532/build/librfid.so
     - assets/env.yaml
+    - assets/libperiphery_aarch64.so
 

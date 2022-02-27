@@ -1,15 +1,17 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'dart:isolate';
 
 import 'package:fpdart/fpdart.dart';
 import 'package:stream_channel/isolate_channel.dart';
+import 'package:dart_periphery/dart_periphery.dart';
 
 import 'package:terminal_frontend/domain/chip_scan/chip_scan_data.dart';
 import 'package:terminal_frontend/domain/chip_scan/chip_scan_service_interface.dart';
 import 'package:terminal_frontend/domain/core/basic_failures.dart';
-import 'package:terminal_frontend/infrastructure/chip_scan/rfid_reader.dart';
+import 'package:terminal_frontend/infrastructure/chip_scan/chip_scan_dto.dart';
 import 'package:terminal_frontend/infrastructure/chip_scan/isolate_command.dart';
+import 'package:terminal_frontend/infrastructure/chip_scan/pn532_driver/pn532.dart';
+import 'package:terminal_frontend/infrastructure/chip_scan/pn532_driver/pn532_spi_impl.dart';
 
 
 class ChipScanService extends ChipScanServiceInterface {
@@ -58,7 +60,7 @@ class ChipScanService extends ChipScanServiceInterface {
   }
 
   static void _uidIsolate(SendPort sendPort) {
-    late final RfidReader rfidReader;
+    late final PN532 rfidReader;
     final IsolateChannel isolateChannel = IsolateChannel.connectSend(sendPort);
     Timer? executionTimer;
 
@@ -88,37 +90,35 @@ class ChipScanService extends ChipScanServiceInterface {
           break;
 
         case IsolateCommandType.terminate:
-          rfidReader.closeRfidReader();
+          rfidReader.dispose();
           break;
       }
     });
   }
 
-  static RfidReader _getRfidReader(String dyLibPath) {
-    final RfidReader rfidReader = RfidReader(dyRfidLibPath: dyLibPath);
-    Either<RfidFailure, Unit> initResult = rfidReader.initRfidReader();
-
-    initResult.fold(
-      (failure) { 
-        assert(false, "RFID init error! - Not a root user or something else?");
-      }, 
-      (unit) => null
+  static PN532 _getRfidReader(String dyLibPath) {
+    setCustomLibrary(dyLibPath);
+    final PN532SpiImpl pn532spiImpl = PN532SpiImpl(
+      resetPin: 12,
+      irqPin: 16,
     );
+    final PN532 rfidReader = PN532(pn532ProtocolImpl: pn532spiImpl);
+
+    // if this throws something is already wrong with the PN532 and you should
+    // check the wiring and probably just restart the whole Pi
+    rfidReader.setSamConfiguration();
 
     return rfidReader;
   }
 
-  static void _uidHelper(IsolateChannel isolateChannel, RfidReader rfidReader) async {
-    Either<RfidFailure, ChipScanData> result = rfidReader.getUid();
-
-    result.fold(
-      (rfidFailure) {
-        // nothing we can do here - just skip
-      }, 
-      (chipScanData) {
-        isolateChannel.sink.add(chipScanData);
-      }
-    );
+  static void _uidHelper(IsolateChannel isolateChannel, PN532 rfidReader) async {
+    try {
+      final List<int> id = rfidReader.getPassivTargetId();
+      final ChipScanDto chipScanDto = ChipScanDto(uidData: id);
+      isolateChannel.sink.add(chipScanDto.toDomain());
+    } catch (_) {
+      // nothing we can do here - just skip
+    }
   }
 
   @override

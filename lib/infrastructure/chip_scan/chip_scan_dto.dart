@@ -7,14 +7,6 @@ class ChipScanDto {
 
   ChipScanDto({required this.uidData});
 
-  factory ChipScanDto.fromData({required Pointer<Uint8> dataArrPointer, required int uidLength}) {
-    List<int> tmpUidData = List.generate(uidLength, (index) {
-      return dataArrPointer.elementAt(index).value;
-    });
-    
-    return ChipScanDto(uidData: tmpUidData);
-  }
-
   ChipScanData toDomain() {
     final StringBuffer stringBuffer = StringBuffer('');
     for (int x in uidData) {
