@@ -64,10 +64,14 @@ int PN532_WriteFrame(PN532* pn532, uint8_t* data, uint16_t length) {
     }
     frame[3] = length & 0xFF;
     frame[4] = (~length + 1) & 0xFF;
+
+
+
     for (uint8_t i = 0; i < length; i++) {
         frame[5 + i] = data[i];
         checksum += data[i];
     }
+
     frame[length + 5] = ~checksum & 0xFF;
     frame[length + 6] = PN532_POSTAMBLE;
     if (pn532->write_data(frame, length + 7) != PN532_STATUS_OK) {
@@ -108,7 +112,7 @@ int PN532_ReadFrame(PN532* pn532, uint8_t* response, uint16_t length) {
     uint8_t frame_len = buff[offset];
     if (((frame_len + buff[offset+1]) & 0xFF) != 0) {
         pn532->log("Response length checksum did not match length!");
-        return PN532_STATUS_ERROR;
+        return PN532_STATUS_ERROR
     }
     // Check frame checksum value matches bytes.
     for (uint8_t i = 0; i < frame_len + 1; i++) {
@@ -140,7 +144,7 @@ int PN532_ReadFrame(PN532* pn532, uint8_t* response, uint16_t length) {
   * @param timeout: timout of systick
   * @retval: Returns the length of response or -1 if error.
   */
-int PN532_CallFunction(
+intPN532_CallFunction(
     PN532* pn532,
     uint8_t command,
     uint8_t* response,

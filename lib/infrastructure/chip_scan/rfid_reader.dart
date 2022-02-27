@@ -62,7 +62,7 @@ class RfidReader {
 
   late final GetUidDart _getUidFunction;
   
-  RfidReader({required this. dyRfidLibPath});
+  RfidReader({required this.dyRfidLibPath});
 
   /// @throws DynamicLibrary.open() and the .lookup function can throw!
   ///         These errors aren't handeled for a good reason. If this happens

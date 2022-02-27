@@ -29,13 +29,16 @@ class EnvironmentConfig {
 
 class InjectionContainer {
   static const String envRelativPath = 'assets/env.yaml';
-  static const String coffeeImgRelativPath = 'assets/icons/coffee-mug.png';
-  static const String rfidDyLibRelativPath = 'assets/pn532/build/librfid.so';
 
   static const String envKey = 'environment';
+  static const String assetsKey = 'assets';
+
   static const String schemeKey = 'scheme';
   static const String hostKey = 'host_name';
   static const String terminalTokenKey = 'terminal_token';
+
+  static const String rfidLibKey = 'rfid_lib_relative_path';
+  static const String coffeeImgKey = 'coffee_image_relative_path';
 
   // get an instance of the GetIt singleton to use for injection
   static final GetIt getIt = GetIt.I; // equal to: GetIt.instance;
@@ -57,14 +60,15 @@ class InjectionContainer {
   static Future<EnvironmentConfig> _getEnvConfig() async {
     final Uri currentDir = Directory.current.uri;
     final Uri envUri = Uri(path: "${currentDir.path}$envRelativPath");
-    final Uri coffeeImgUri = Uri(path: "${currentDir.path}$coffeeImgRelativPath");
-    final Uri rfidDyLibUri = Uri(path: "${currentDir.path}$rfidDyLibRelativPath");
 
     final String confYaml = await File(envUri.toFilePath()).readAsString();
     final configMap = loadYaml(confYaml);
 
     final envConfigs = configMap[envKey]!;
+    final assetsConfigs = configMap[assetsKey];
 
+    final Uri rfidDyLibUri = Uri(path: "${currentDir.path}${assetsConfigs[rfidLibKey]}");
+    final Uri coffeeImgUri = Uri(path: "${currentDir.path}${assetsConfigs[coffeeImgKey]}");
     return EnvironmentConfig(
       serverUri: Uri(
         scheme: envConfigs[schemeKey]!, 
@@ -81,7 +85,7 @@ class InjectionContainer {
     final EnvironmentConfig envConfig = await _getEnvConfig();
 
     final Map<String, String> headers = <String, String>{
-      'Authorization' : 'Bearer ${envConfig.authToken}',
+      'authorization' : 'Bearer ${envConfig.authToken}',
       'content-type' : 'application/json',
     };
     final CachedHttpClient httpClient = CachedHttpClient(

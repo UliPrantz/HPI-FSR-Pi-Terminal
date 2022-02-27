@@ -16,7 +16,7 @@ class ChipScanDto {
   }
 
   ChipScanData toDomain() {
-    final StringBuffer stringBuffer = StringBuffer('0x');
+    final StringBuffer stringBuffer = StringBuffer('');
     for (int x in uidData) {
       final String tmpString = x.toRadixString(16).padLeft(0, '0');
       stringBuffer.write(tmpString);
