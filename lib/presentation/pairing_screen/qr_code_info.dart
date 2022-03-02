@@ -19,6 +19,7 @@ class QrCodeInfo extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(15.0),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Expanded(
             child: Center(
@@ -28,6 +29,7 @@ class QrCodeInfo extends StatelessWidget {
                 "or scan the QR-Code to pair your HPI-Token",
                 textAlign: TextAlign.center,
                 style: TextStyles.normalTextBlack,
+                softWrap: true,
               ),
             ),
           ),

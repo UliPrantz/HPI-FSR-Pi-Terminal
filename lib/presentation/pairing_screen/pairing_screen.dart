@@ -13,7 +13,7 @@ import 'package:terminal_frontend/presentation/core/app_bar.dart';
 import 'package:terminal_frontend/presentation/core/snack_bar.dart';
 import 'package:terminal_frontend/presentation/core/styles/colors.dart';
 import 'package:terminal_frontend/presentation/pairing_screen/numpad.dart';
-import 'package:terminal_frontend/presentation/pairing_screen/pairing_code_input.dart';
+import 'package:terminal_frontend/presentation/pairing_screen/pairing_code_display.dart';
 import 'package:terminal_frontend/presentation/pairing_screen/qr_code_info.dart';
 
 class PairingScreen extends StatelessWidget {
@@ -57,9 +57,9 @@ class PairingScreen extends StatelessWidget {
             Expanded(
               flex: 2,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  PairingCodeInput(
+                  PairingCodeDisplay(
                     pairingCubit: pairingCubit,
                     numberOfDigits: PairingCubit.maxPairCodeLength,
                   ),

@@ -5,11 +5,11 @@ import 'package:terminal_frontend/application/pairing/pairing_cubit.dart';
 import 'package:terminal_frontend/application/pairing/pairing_state.dart';
 import 'package:terminal_frontend/presentation/pairing_screen/digit_container.dart';
 
-class PairingCodeInput extends StatelessWidget {
+class PairingCodeDisplay extends StatelessWidget {
   final PairingCubit pairingCubit;
   final int numberOfDigits;
 
-  const PairingCodeInput({
+  const PairingCodeDisplay({
     Key? key, 
     required this.numberOfDigits,
     required this.pairingCubit,

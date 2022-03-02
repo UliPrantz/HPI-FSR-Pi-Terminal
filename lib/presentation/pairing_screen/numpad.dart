@@ -38,7 +38,7 @@ class Numpad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(left: 32, right: 32, top: 20),
+      padding: const EdgeInsets.only(left: 32, right: 32),
       alignment: Alignment.center,
       child: Column(
         children: <Widget>[
