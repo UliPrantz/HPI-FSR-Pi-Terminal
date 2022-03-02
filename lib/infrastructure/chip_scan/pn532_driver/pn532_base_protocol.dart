@@ -45,13 +45,13 @@ abstract class PN532BaseProtocol {
     
     bool pn532IsReady = pn532ReadyFunction(attemptCount);
     while (!pn532IsReady) {
-      // this sleep is extremly important!
+      // this sleep is extremly important! (when we don't use the irqPin)
       // without you read the pn532 to often which curses to many interrupts
       // on the pn532 board which results in to little execution time for the
       // actual command/firmware on the pn532 which ends up in only getting
       // PN532TimeoutException because the pn532 can't process the actual command
       // (this can be avoided by only using the IRQ pin!)
-      if (useIrq) {
+      if (!useIrq) {
         sleep(const Duration(milliseconds: 20));
       }
       

@@ -98,9 +98,7 @@ class ChipScanService extends ChipScanServiceInterface {
 
   static PN532 _getRfidReader(String dyLibPath) {
     setCustomLibrary(dyLibPath);
-    final PN532SpiImpl pn532spiImpl = PN532SpiImpl(
-      irqPin: 16 // TODO seems to only work with interrupt while when only the pn532 driver was tested it worked without too????!
-    );
+    final PN532SpiImpl pn532spiImpl = PN532SpiImpl();
     final PN532 rfidReader = PN532(pn532ProtocolImpl: pn532spiImpl);
 
     // if this throws something is already wrong with the PN532 and you should
