@@ -22,7 +22,7 @@ class ItemList extends StatelessWidget {
             itemCount: state.shoppingData.selectedItems.length,
             physics: const AlwaysScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3
+              crossAxisCount: 2
             ), 
             itemBuilder: (BuildContext context, int itemCount) => ItemCard(
               shoppingCubit: shoppingCubit,

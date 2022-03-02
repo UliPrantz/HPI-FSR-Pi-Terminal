@@ -21,7 +21,7 @@ class CheckoutPreview extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.symmetric(
             vertical: 8.0,
-            horizontal: 15.0
+            horizontal: 7.5
           ),
           child: Column(
             children: [
