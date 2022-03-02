@@ -11,7 +11,7 @@ typedef ListCompare = bool Function(List<dynamic>, List<dynamic>);
 
 
 class PN532 {
-  final ListCompare _listCompare = ListEquality().equals;
+  final ListCompare _listCompare = const ListEquality().equals;
 
   final PN532BaseProtocol pn532ProtocolImpl;
   
@@ -139,7 +139,7 @@ class PN532 {
   /// Can throw `PN532WrongAckException` when the read 
   /// Ack flag was not `pn532Ack`
   void _readAck() {
-    final int ackBuffLen = 6;
+    const int ackBuffLen = 6;
     final List<int> response = pn532ProtocolImpl.readData(ackBuffLen);
     
     if (!_listCompare(response, pn532Ack)) {

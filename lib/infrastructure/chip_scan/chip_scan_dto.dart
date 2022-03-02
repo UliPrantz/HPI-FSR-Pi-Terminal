@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:terminal_frontend/domain/chip_scan/chip_scan_data.dart';
 
 class ChipScanDto {

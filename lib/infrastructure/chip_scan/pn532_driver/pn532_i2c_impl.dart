@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dart_periphery/dart_periphery.dart';
 
 import 'package:terminal_frontend/infrastructure/chip_scan/pn532_driver/pn532_base_protocol.dart';
@@ -13,7 +11,10 @@ class PN532I2CImpl extends PN532BaseProtocol {
 
   PN532I2CImpl({
     int busNumber = 1,
-  }) : i2c = I2C(busNumber);
+    int? resetPin,
+    int? irqPin,
+  }) : i2c = I2C(busNumber),
+       super(resetPin: resetPin, irqPin: irqPin);
 
 
   @override
@@ -52,31 +53,15 @@ class PN532I2CImpl extends PN532BaseProtocol {
     i2c.writeBytes(pn532I2CAddress, data);
   }
 
-
-  /// We wait for timeout ms and if the PN532 didn't say it's ready yet
-  ///  in this time an `PN532TimeoutException` is thrown
   @override
-  void waitReady({int timeout=pn532StandardTimeout}) {
-    final int timeStart = DateTime.now().millisecondsSinceEpoch;
-
-    while (!isReady()) {
-      final int timeDelta = DateTime.now().millisecondsSinceEpoch - timeStart;
-
-      if (timeDelta >= timeout) {
-        throw PN532TimeoutExcepiton(timeout: timeout);
-      }
-
-      sleep(const Duration(milliseconds: 10));
-    }
-  }
-
-  bool isReady() {
+  bool isReady(int attemptCount) {
     int ready = i2c.readByte(pn532I2CAddress);
     return ready == pn532I2CReady;
   }
 
   @override
   void dispose() {
+    super.dispose();
     i2c.dispose();
   }
 }

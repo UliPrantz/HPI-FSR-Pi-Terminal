@@ -47,7 +47,7 @@ class Uint8 {
 
     // generate makes with all 1 except the 8 lsb bits 
     // Bit view: 1 1 1 .... 1 1 1 0 0 0 0 0 0 0 0
-    final int mask = ~0xff;
+    const int mask = ~0xff;
 
     // or the mask and value to get some thing like the following
     // (example for `value` = 127 = 0 1 1 1 1 1 1 1)

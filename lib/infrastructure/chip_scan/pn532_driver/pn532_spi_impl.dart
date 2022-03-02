@@ -4,18 +4,16 @@ import 'package:dart_periphery/dart_periphery.dart';
 
 import 'package:terminal_frontend/infrastructure/chip_scan/pn532_driver/pn532_base_protocol.dart';
 import 'package:terminal_frontend/infrastructure/chip_scan/pn532_driver/pn532_constants.dart';
-import 'package:terminal_frontend/infrastructure/chip_scan/pn532_driver/pn532_exceptions.dart';
 import 'package:terminal_frontend/infrastructure/chip_scan/pn532_driver/utils.dart';
 
 
 
 class PN532SpiImpl extends PN532BaseProtocol {
 
-  final GPIO? resetGpio;
-  final GPIO? irqGpio;
   final GPIO? chipSelectGpio;
-  
   final SPI spi;
+
+  List<int> pn532StatusList = [pn532SpiStartRead, 0x00];
 
   /// The `irqPin` and the `resetPin` are both optional!
   /// Actually the `irqPin` isn't used at all and the `resetPin` doesn't seem
@@ -34,16 +32,21 @@ class PN532SpiImpl extends PN532BaseProtocol {
   /// GPIO pin of the pi just be aware that it seems like that the used dart 
   /// package `dart_periphery` can't open all GPIOs 
   /// (like in my test GPIO09) - then just use a different one.
+  /// 
+  /// Also be sure that the `irqPin` is properly connected since the interrupt
+  /// works the way that the `irqPin` uses low to activate - means that if it
+  /// isn't properly connect the driver doesn't wait for the PN532 to be ready
+  /// for a response and you get kind of cryptic responses like
+  /// `PN532BadResponseException` just because of the wrongly connected `irqPin`.
   PN532SpiImpl({
     int? resetPin,
     int? irqPin,
     int? chipSelectPin,
     int spiBus = 0,
     int spiChip = 0,
-  }) : resetGpio = resetPin == null ? null : GPIO(resetPin, GPIOdirection.GPIO_DIR_OUT),
-       irqGpio = irqPin == null ? null : GPIO(irqPin, GPIOdirection.GPIO_DIR_IN),
-       chipSelectGpio = chipSelectPin == null ? null : GPIO(chipSelectPin, GPIOdirection.GPIO_DIR_IN),
-       spi = SPI(spiBus, spiChip, SPImode.MODE0, 500000) 
+  }) : chipSelectGpio = chipSelectPin == null ? null : GPIO(chipSelectPin, GPIOdirection.GPIO_DIR_IN),
+       spi = SPI(spiBus, spiChip, SPImode.MODE0, 500000),
+       super(resetPin: resetPin, irqPin: irqPin)
   {
     reset();
     wakeUp();
@@ -106,30 +109,15 @@ class PN532SpiImpl extends PN532BaseProtocol {
     sleep(const Duration(milliseconds: 100));
   }
 
-
   @override
-  void waitReady({int timeout = pn532StandardTimeout}) {
-    final int timeStart = DateTime.now().millisecondsSinceEpoch;
-    sleep(const Duration(milliseconds: 10));
-
-    List<int> statusRequest = [pn532SpiStartRead, 0x00];
-    statusRequest = readWriteHelper(statusRequest);
-    
-    while (statusRequest[1] != pn532SpiReady) {
-      // this sleep is extremly important!
-      // without you read the pn532 to often which curses to many interrupts
-      // on the pn532 board which results in to little execution time for the
-      // actual command/firmware on the pn532 which ends up in only getting
-      // PN532TimeoutException because the pn532 can't process the actual command
-      // (this can be avoided by only using the IRQ pin!)
-      sleep(const Duration(milliseconds: 20));
-      statusRequest = readWriteHelper(statusRequest);
-
-      final int timeDelta = DateTime.now().millisecondsSinceEpoch - timeStart;
-      if (timeDelta >= timeout) {
-        throw PN532TimeoutExcepiton(timeout: timeout);
-      }
+  bool isReady(int attemptCount) {
+    if (attemptCount == 0) {
+      pn532StatusList = [pn532SpiStartRead, 0x00];
     }
+
+    pn532StatusList = readWriteHelper(pn532StatusList);
+
+    return pn532StatusList[1] == pn532SpiReady;
   }
 
   @override
@@ -158,8 +146,7 @@ class PN532SpiImpl extends PN532BaseProtocol {
 
   @override
   void dispose() {
-    resetGpio?.dispose();
-    irqGpio?.dispose();
+    super.dispose();
     chipSelectGpio?.dispose();
     spi.dispose();
   }

@@ -50,5 +50,5 @@ flutter:
   assets:
     - assets/icons/coffee-mug.png
     - assets/env.yaml
-    - assets/libperiphery_aarch64.so
+    - assets/libperiphery_arm.so
 
