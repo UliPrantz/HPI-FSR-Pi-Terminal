@@ -111,34 +111,26 @@ Detail instructions can be found [here](https://github.com/ardera/flutter-pi).
 5. Configure the GPU memory
    `Performance Options -> GPU Memory` and enter `64`.
 
-6. Leave `raspi-config`.
+6. Enable SPI:
+   `Interface Options -> SPI -> Yes`
 
-7. Give the `pi` permission to use 3D acceleration. (**NOTE:** potential security hazard. If you don't want to do this, launch `flutter-pi` using `sudo` instead.)
+7. Leave `raspi-config`.
+
+8. Give the `pi` permission to use 3D acceleration - normally this is already done in the script but doing it again does no harm. (**NOTE:** potential security hazard. If you don't want to do this, launch `flutter-pi` using `sudo` instead.)
     ```bash
-    usermod -a -G render pi
+    sudo usermod -a -G render pi
     ```
 
-8. Finish and reboot.
+8. Finish and reboot: `sudo shutdown -r now`
 
 
-# Compiling the Flutter App for Raspberry Pi   ====== TODO
+# Compiling the Flutter App for Raspberry Pi
 
-`flutter build bundle`
+## Setting up the dependencies
 
+> **IMPORTANT:** Do all this on a Linux `x86_64` machine which is **not** the Raspberry Pi (since the Pi is `arm`!)
 
-## Get the `engine-binaries` for the Flutter version you are building the bundle with
-
-`git clone --depth 1 https://github.com/ardera/flutter-engine-binaries-for-arm.git engine-binaries`
-
-
-## Build the app
-
-> Some assumption here: 
-> 1. The app dir is called `flutter_terminal`
-> 2. The `package_name` in `pubspec.yaml` is `terminal_frontend`
-> 3. We are using `flutter-elinux` instead of `flutter` (this isn't mandotory) and it's located in `/opt/flutter-elinux` and the standard flutter sdk path is `/opt/flutter-elinux/flutter/bin` (When used with normal flutter just change the last path to your flutter sdk path)
-
-Also the folder structure look something like this (except the stuff inside the build directory we will generate it in the next steps):
+We want create a file structure that looks like the following:
 ```
 engine_binaries/
 │ 
@@ -160,48 +152,57 @@ flutter_terminal/
 ├─ README.md
 ```
 
-### Change into the flutter dir
-`cd flutter_terminal`
+1. Install flutter on the system (just follow the instructions [here](https://docs.flutter.dev/get-started/install/linux)) - basically just: `sudo snap install flutter --classic`
 
-### Build the flutter app
-```
-/opt/flutter-elinux/flutter/bin/cache/dart-sdk/bin/dart \
-  /opt/flutter-elinux/flutter/bin/cache/dart-sdk/bin/snapshots/frontend_server.dart.snapshot \
-  --sdk-root /opt/flutter-elinux/flutter/bin/cache/artifacts/engine/common/flutter_patched_sdk_product \
-  --target=flutter \
-  --aot \
-  --tfa \
-  -Ddart.vm.product=true \
-  --packages .packages \
-  --output-dill build\kernel_snapshot.dill \
-  --verbose \
-  --depfile build\kernel_snapshot.d \
-  package:terminal_frontend/main.dart
-```
+2. Now clone the engine binaries: `git clone --depth 1 https://github.com/ardera/flutter-engine-binaries-for-arm.git engine-binaries` <br>
+**Important check that the engine binaries version equals the used flutter verion (`flutter --version`)**
 
+3. After that actual clone the project `git clone https://gitlab.hpi.de/fachschaftsrat/wallet/flutter_terminal flutter_terminal`
 
-## Now we have to switch to a x64 linux machine! (best option is to do all this stuff on a x64 linux machine)
+4. Change into the project with `cd flutter_terminal`
 
-- Execute the following command to generate the final snapshot
-- When building for `arm64` add this `--sim-use-hardfp` flag
+5. Build the flutter bundle with: `flutter build bundle`
 
-```
-../engine-binaries/arm/gen_snapshot_linux_x64_release \
-  --deterministic \
-  --snapshot_kind=app-aot-elf \
-  --elf=build/flutter_assets/app.so \
-  --strip \
-  build/kernel_snapshot.dill`
-```
+## Compiling the app
 
-## Get the snapshot on the rapsberry pi
+> Now we should have the following setup: 
+> 1. The app dir is called `flutter_terminal`
+> 2. The engine binaries are in `engine-binaries`
+> 3. The `name` in `flutter_terminal/pubspec.yaml` is `terminal_frontend`
+> 4. The Flutter SDK should be downloaded and reachable with `flutter sdk-path` **(execute this or one other Flutter command at least once to trigger the SDK download)**
 
-- Change `coffee-pi` to `pi@PI-IP`
+1. Change into the project directory with: `cd flutter_terminal`
 
-`rsync -a ./build/flutter_assets/ pi@raspberrypi.local:~/FsrTerminal`
+2. Execute the following to build the kernel snapshot:
+    ```
+    $(flutter sdk-path)/bin/cache/dart-sdk/bin/dart \
+    $(flutter sdk-path)/bin/cache/dart-sdk/bin/snapshots/frontend_server.dart.snapshot \
+    --sdk-root $(flutter sdk-path)/bin/cache/artifacts/engine/common/flutter_patched_sdk_product \
+    --target=flutter \
+    --aot \
+    --tfa \
+    -Ddart.vm.product=true \
+    --packages .packages \
+    --output-dill build\kernel_snapshot.dill \
+    --verbose \
+    --depfile build\kernel_snapshot.d \
+    package:terminal_frontend/main.dart
+    ```
 
+3. Build the `app.so` with the `gen_snapshot_linux_x64_release` from the [engine binaries repo](https://github.com/ardera/flutter-engine-binaries-for-arm)
+**(When building for `arm64` add the `--sim-use-hardfp` flag)**
+    ```
+    ../engine-binaries/arm/gen_snapshot_linux_x64_release \
+    --deterministic \
+    --snapshot_kind=app-aot-elf \
+    --elf=build/flutter_assets/app.so \
+    --strip \
+    build/kernel_snapshot.dill`
+    ```
+    **(Be aware that for this step the engine binaries must be located inside the parent directory as shown in the folder structure at the top)**
+## Copy the `flutter_assets` (with `app.so` snapshot in it) to the Raspberry Pi
 
-# End TODO ============================
+- Copying everything into `~/FsrTerminal` on the Pi by executing `rsync -a ./build/flutter_assets/ pi@raspberrypi.local:~/FsrTerminal/`
 
 # Enabling app start after boot up
 
