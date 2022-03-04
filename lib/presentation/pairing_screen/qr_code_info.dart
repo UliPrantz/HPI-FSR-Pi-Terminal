@@ -25,22 +25,20 @@ class QrCodeInfo extends StatelessWidget {
             child: Center(
               child: Text(
                 "Please enter your pairing code "
-                "(which can be generated here: '${serverUri.host}') "
+                "which can be generated here: '${serverUri.host}' "
                 "or scan the QR-Code to pair your HPI-Token",
                 textAlign: TextAlign.center,
                 style: TextStyles.normalTextBlack,
-                softWrap: true,
               ),
             ),
           ),
 
           Expanded(
-            flex: 3,
             child: Center(
               child: QrImage(
                 data: serverUri.replace(path: "$pairingEndpoint$tokenId").toString(),
                 version: 9,
-                size: 200,
+                size: 135,
                 errorCorrectionLevel: QrErrorCorrectLevel.Q,
               ),
             ),

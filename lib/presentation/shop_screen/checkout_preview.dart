@@ -61,7 +61,7 @@ class CheckoutPreview extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: const [
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 4.0),
+                            padding: EdgeInsets.symmetric(horizontal: 1.0),
                             child: Text(
                               "Checkout",
                             ),

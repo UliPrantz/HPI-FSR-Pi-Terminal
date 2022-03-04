@@ -23,8 +23,8 @@ class CalcButton extends StatelessWidget {
       },
       child: Container(
         alignment: Alignment.center,
-        width: 50,
-        height: 50,
+        width: 60,
+        height: 30,
         child: Text(
           value,
           style: TextStyle(
