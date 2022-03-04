@@ -159,9 +159,11 @@ flutter_terminal/
 
 3. After that actual clone the project `git clone https://gitlab.hpi.de/fachschaftsrat/wallet/flutter_terminal flutter_terminal`
 
-4. Change into the project with `cd flutter_terminal`
+4. Change into the project with: `cd flutter_terminal`
 
-5. Build the flutter bundle with: `flutter build bundle`
+5. Generate all the files that need code generation with: `flutter_terminal % flutter pub run build_runner build`
+
+6. Build the flutter bundle with: `flutter build bundle`
 
 ## Compiling the app
 
