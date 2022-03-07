@@ -2,6 +2,7 @@
 
 ## WiFi
 ### Corporate wifi setup for `eduroam` (802.1X Standard)
+
 1. First setup the `wpa_supplicant.conf` which is located in `/etc/wpa_supplicant` (full path is `/etc/wpa_supplicant/wpa_supplicant.conf`)<br>
     Past the following content into the file:
     ```
@@ -20,6 +21,7 @@
 2. Reboot the pi
 
 ### Troubleshooting
+
 1. Sometimes you may also have to edit `/etc/network/interfaces` and add the following lines:
     ```bash
     allow-hotplug wlan0
@@ -126,9 +128,10 @@ Detail instructions can be found [here](https://github.com/ardera/flutter-pi).
 
 # Compiling the Flutter App for Raspberry Pi
 
-## Setting up the dependencies
+> **IMPORTANT:** Do all this on a Linux `x86_64` machine which is **not** the Raspberry Pi (since the Pi is `arm`!) <br>
+> For performance reason you could also execute every command on any development machine **except for the third step in `Compiling the app`** since the `gen_snapshot_linux_x64_release` executable is only compiled for `x64` as the name says
 
-> **IMPORTANT:** Do all this on a Linux `x86_64` machine which is **not** the Raspberry Pi (since the Pi is `arm`!)
+## Setting up the dependencies
 
 We want create a file structure that looks like the following:
 ```
@@ -161,9 +164,11 @@ flutter_terminal/
 
 4. Change into the project with: `cd flutter_terminal`
 
-5. Generate all the files that need code generation with: `flutter_terminal % flutter pub run build_runner build`
+5. Edit the `env.example.yaml` in a way that it works for you and copy/rename it to `env.yaml` for example with: `mv env.example.yaml env.yaml`
 
-6. Build the flutter bundle with: `flutter build bundle`
+6. Generate all the files that need code generation with: `flutter pub run build_runner build`
+
+7. Build the flutter bundle with: `flutter build bundle`
 
 ## Compiling the app
 
@@ -171,12 +176,12 @@ flutter_terminal/
 > 1. The app dir is called `flutter_terminal`
 > 2. The engine binaries are in `engine-binaries`
 > 3. The `name` in `flutter_terminal/pubspec.yaml` is `terminal_frontend`
-> 4. The Flutter SDK should be downloaded and reachable with `flutter sdk-path` **(execute this or one other Flutter command at least once to trigger the SDK download)**
+> 4. The Flutter SDK should be downloaded and reachable with `flutter sdk-path` **(execute this or any other Flutter command at least once to trigger the SDK download)**
 
-1. Change into the project directory with: `cd flutter_terminal`
+1. If you aren't already in the flutter project directory change into it with: `cd flutter_terminal`
 
 2. Execute the following to build the kernel snapshot:
-    ```
+    ```bash
     $(flutter sdk-path)/bin/cache/dart-sdk/bin/dart \
     $(flutter sdk-path)/bin/cache/dart-sdk/bin/snapshots/frontend_server.dart.snapshot \
     --sdk-root $(flutter sdk-path)/bin/cache/artifacts/engine/common/flutter_patched_sdk_product \
@@ -193,13 +198,13 @@ flutter_terminal/
 
 3. Build the `app.so` with the `gen_snapshot_linux_x64_release` from the [engine binaries repo](https://github.com/ardera/flutter-engine-binaries-for-arm)
 **(When building for `arm64` add the `--sim-use-hardfp` flag)**
-    ```
+    ```bash
     ../engine-binaries/arm/gen_snapshot_linux_x64_release \
     --deterministic \
     --snapshot_kind=app-aot-elf \
     --elf=build/flutter_assets/app.so \
     --strip \
-    build/kernel_snapshot.dill`
+    build/snapshot_blob.bin.d
     ```
     **(Be aware that for this step the engine binaries must be located inside the parent directory as shown in the folder structure at the top)**
 ## Copy the `flutter_assets` (with `app.so` snapshot in it) to the Raspberry Pi
@@ -210,30 +215,33 @@ flutter_terminal/
 
 ## Creating the `systemd` entry
 
-1. Create a new file in `/etc/systemd` called `fsr-terminal.service` with `touch /etc/systemd/fsr-terminal.service`
+1. Create a new file in `/etc/systemd/system` called `fsr-terminal.service` with `sudo touch /etc/systemd/system/fsr-terminal.service`
 
-2. Past in the following content:
+2. Past in the following content (with `sudo vim /etc/systemd/system/fsr-terminal.service`):
 
     ```apache
     [Unit]
     Description=The service starting and controlling the FSR Terminal Flutter App
     After=multi-user.target
 
+    # Getting a little fancy with the restart options here
+    # The next 3 options are tightly connected to each other
+    # Give up restarting and exec StartLimitAction - if it fails 2 times (=StartLimitBurst) within 60 (=StartLimitIntervalSec) seconds
+    StartLimitBurst=2 
+    StartLimitIntervalSec=60
+    StartLimitAction=reboot-force
+
     [Service]
     User=pi
-    ExecStart=flutter-pi --release ~/FsrTerminal
+    WorkingDirectory=%h/FsrTerminal
+    # Sometimes the flutter-pi path must be given in absolute form
+    ExecStart=flutter-pi --release .
     ExecStop=/usr/bin/killall flutter-pi
 
-    # Getting a little fancy with the restart rules
-    Restart=always  
-
-    # The next 3 options are tightly connected to each other
-    # Give up restarting and exec StartLimitAction - if it fails 2 times (=StartLimitBurst) within 30 (=StartLimitIntervalSec) seconds
-    StartLimitBurst=2 
-    StartLimitIntervalSec=30
-    # wait 10 second2 between restart
-    RestartSec=10                 
-    StartLimitAction=sudo reboot
+    # Always try to restart
+    Restart=always
+    # Retry restart after 10s
+    RestartSec=10 
 
     # Useful during debugging; remove it once the service is working
     #StandardOutput=console
@@ -242,10 +250,14 @@ flutter_terminal/
     WantedBy=multi-user.target
     ```
 
-3. Enable the service by executing `systemctl enable fsr-terminal`
+3. Reload the service-files though the new service will be found `sudo systemctl daemon-reload` 
+
+4. Enable the service by executing `sudo systemctl enable fsr-terminal`
+
 4. After a restart the system should automatically open the FSR Terminal
 
 ## Troubleshooting
 
 - Check the output of `systemctl status fsr-terminal`
-- Debug the serive by uncommenting the last line of the `[Service]` section in the `/etc/systemd/fsr-terminal.service` file and start the service with `systemctl start fsr-terminal` (if it's somehow already/still running kill it with `systemctl stop fsr-terminal`)
+- Debug the serive by uncommenting the last line of the `[Service]` section in the `/etc/systemd/system/fsr-terminal.service` file and start the service with `systemctl start fsr-terminal` (if it's somehow already/still running kill it with `systemctl stop fsr-terminal`)
+- Verifying the corectness of the config file with `sudo systemd-analyze verify /etc/systemd/system/fsr-terminal.service`
