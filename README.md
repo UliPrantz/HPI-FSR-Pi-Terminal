@@ -178,7 +178,7 @@ flutter_terminal/
 > 3. The `name` in `flutter_terminal/pubspec.yaml` is `terminal_frontend`
 > 4. The Flutter SDK should be downloaded and reachable with `flutter sdk-path` **(execute this or any other Flutter command at least once to trigger the SDK download)**
 
-1. If you aren't already in the flutter project directory change into it with: `cd flutter_terminal`
+1. If you **aren't already** in the flutter project directory change into it with: `cd flutter_terminal`
 
 2. Execute the following to build the kernel snapshot:
     ```bash
@@ -190,9 +190,9 @@ flutter_terminal/
     --tfa \
     -Ddart.vm.product=true \
     --packages .packages \
-    --output-dill build\kernel_snapshot.dill \
+    --output-dill build/kernel_snapshot.dill \
     --verbose \
-    --depfile build\kernel_snapshot.d \
+    --depfile build/kernel_snapshot.d \
     package:terminal_frontend/main.dart
     ```
 
@@ -204,7 +204,7 @@ flutter_terminal/
     --snapshot_kind=app-aot-elf \
     --elf=build/flutter_assets/app.so \
     --strip \
-    build/snapshot_blob.bin.d
+    build/kernel_snapshot.dill
     ```
     **(Be aware that for this step the engine binaries must be located inside the parent directory as shown in the folder structure at the top)**
 ## Copy the `flutter_assets` (with `app.so` snapshot in it) to the Raspberry Pi
@@ -233,9 +233,8 @@ flutter_terminal/
 
     [Service]
     User=pi
-    WorkingDirectory=%h/FsrTerminal
     # Sometimes the flutter-pi path must be given in absolute form
-    ExecStart=flutter-pi --release .
+    ExecStart=flutter-pi --release %h/FsrTerminal
     ExecStop=/usr/bin/killall flutter-pi
 
     # Always try to restart
@@ -254,10 +253,18 @@ flutter_terminal/
 
 4. Enable the service by executing `sudo systemctl enable fsr-terminal`
 
-4. After a restart the system should automatically open the FSR Terminal
+5. When starting the service with `sudo systemctl start fsr-terminal` the app should start as normal otherwise see the `Troubleshooting` section below
+
+6. After a restart the system should automatically open the FSR Terminal
 
 ## Troubleshooting
 
 - Check the output of `systemctl status fsr-terminal`
+
+- Make sure the `~/FsrTerminal` got the `755` permission with `sudo chmod 755 ~/FsrTerminal`
+
+- Sometimes you also have to change the `ExecStart` of the `fsr-terminal.service` file directive so that you use an absolute path for `flutter-pi`
+
 - Debug the serive by uncommenting the last line of the `[Service]` section in the `/etc/systemd/system/fsr-terminal.service` file and start the service with `systemctl start fsr-terminal` (if it's somehow already/still running kill it with `systemctl stop fsr-terminal`)
+
 - Verifying the corectness of the config file with `sudo systemd-analyze verify /etc/systemd/system/fsr-terminal.service`
