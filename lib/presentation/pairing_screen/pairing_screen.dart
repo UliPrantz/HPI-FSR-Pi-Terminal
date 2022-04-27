@@ -8,7 +8,6 @@ import 'package:terminal_frontend/application/pairing/pairing_cubit.dart';
 import 'package:terminal_frontend/application/pairing/pairing_state.dart';
 import 'package:terminal_frontend/domain/user/user.dart';
 import 'package:terminal_frontend/infrastructure/pairing/pairing_service.dart';
-import 'package:terminal_frontend/injection_container.dart';
 import 'package:terminal_frontend/presentation/core/app_bar.dart';
 import 'package:terminal_frontend/presentation/core/snack_bar.dart';
 import 'package:terminal_frontend/presentation/core/styles/colors.dart';
@@ -44,8 +43,7 @@ class PairingScreen extends StatelessWidget {
           children: [
             Expanded(
               child: QrCodeInfo(
-                serverUri: GetIt.I<EnvironmentConfig>().serverUri,
-                tokenId: tokenId,
+                pairingCubit: pairingCubit,
               )
             ),
 

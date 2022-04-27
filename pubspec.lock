@@ -186,10 +186,10 @@ packages:
   dart_periphery:
     dependency: "direct main"
     description:
-      name: dart_periphery
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.8.25-RC"
+      path: "/Users/uli/Desktop/dart_periphery"
+      relative: false
+    source: path
+    version: "0.8.29"
   dart_style:
     dependency: transitive
     description:
@@ -225,13 +225,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.1.2"
-  file_utils:
-    dependency: transitive
-    description:
-      name: file_utils
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
   fixnum:
     dependency: transitive
     description:
@@ -291,13 +284,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
-  globbing:
-    dependency: transitive
-    description:
-      name: globbing
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.0"
   graphs:
     dependency: transitive
     description:
@@ -431,13 +417,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.0"
-  pedantic:
-    dependency: transitive
-    description:
-      name: pedantic
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.11.1"
   platform:
     dependency: transitive
     description:
@@ -562,13 +541,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
-  system_info:
-    dependency: transitive
-    description:
-      name: system_info
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
   term_glyph:
     dependency: transitive
     description:
@@ -640,5 +612,5 @@ packages:
     source: hosted
     version: "3.1.0"
 sdks:
-  dart: ">=2.14.0 <3.0.0"
+  dart: ">=2.16.0 <3.0.0"
   flutter: ">=1.16.0"

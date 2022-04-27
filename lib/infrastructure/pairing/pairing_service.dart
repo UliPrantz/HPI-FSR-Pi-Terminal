@@ -19,6 +19,9 @@ class PairingService extends PairingServiceInterface {
   PairingService({required this.httpClient});
 
   @override
+  String get qrCodePairingEndpoint => endpoint;
+
+  @override
   Future<Either<HttpFailure, User>> pairUser(PairingData pairingData) async {
     final String uri = "$endpoint${pairingData.tokenId}";
     final String body = jsonEncode(PairingDto.fromDomain(pairingData: pairingData));
@@ -42,4 +45,7 @@ class PairingService extends PairingServiceInterface {
     final UserDto userDto = UserDto.fromJson(response.bodyAsMap);
     return Either.right(userDto.toDomain());
   }
+
+  @override
+  Uri getServerUri() => httpClient.serverUri;
 }

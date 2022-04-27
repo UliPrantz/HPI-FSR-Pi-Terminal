@@ -32,6 +32,7 @@ class CachedHttpClient {
   }
   CachedHttpClient._internal();
 
+  Uri get serverUri => _host!;
 
   Future<Response> get(
     String endpoint, 

@@ -28,7 +28,8 @@ dependencies:
 
   stream_channel: ^2.1.0
   ffi: ^1.1.2
-  dart_periphery: ^0.8.25-RC
+  dart_periphery: 
+    path: /Users/uli/Desktop/dart_periphery
 
 
 dev_dependencies:
@@ -50,5 +51,6 @@ flutter:
   assets:
     - assets/icons/coffee-mug.png
     - assets/env.yaml
+    - assets/StartScript.sh
     - assets/libperiphery_arm.so
 

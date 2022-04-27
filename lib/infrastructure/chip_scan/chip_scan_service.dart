@@ -10,8 +10,6 @@ import 'package:terminal_frontend/domain/chip_scan/chip_scan_service_interface.d
 import 'package:terminal_frontend/domain/core/basic_failures.dart';
 import 'package:terminal_frontend/infrastructure/chip_scan/chip_scan_dto.dart';
 import 'package:terminal_frontend/infrastructure/chip_scan/isolate_command.dart';
-import 'package:terminal_frontend/infrastructure/chip_scan/pn532_driver/pn532.dart';
-import 'package:terminal_frontend/infrastructure/chip_scan/pn532_driver/pn532_spi_impl.dart';
 
 
 class ChipScanService extends ChipScanServiceInterface {
@@ -98,8 +96,8 @@ class ChipScanService extends ChipScanServiceInterface {
 
   static PN532 _getRfidReader(String dyLibPath) {
     setCustomLibrary(dyLibPath);
-    final PN532SpiImpl pn532spiImpl = PN532SpiImpl();
-    final PN532 rfidReader = PN532(pn532ProtocolImpl: pn532spiImpl);
+    final PN532BaseProtocol pn532ProtoImpl = PN532I2CImpl(irqPin: 16);
+    final PN532 rfidReader = PN532(pn532ProtocolImpl: pn532ProtoImpl);
 
     // if this throws something is already wrong with the PN532 and you should
     // check the wiring and probably just restart the whole Pi

@@ -16,9 +16,9 @@ class PairingCubit extends Cubit<PairingState> {
   }) : super(PairingState.init(tokenId: tokenId));
 
   void pairChip() async {
-    // this is just here that we have a change in state everytime this method is 
-    // is called otherwise bloc would optimize that away and we couldn't show 
-    // a snackbar
+    // this emit is just here that we have a change in state 
+    // everytime this method is called otherwise bloc would 
+    // optimize that away and we couldn't show a snackbar
     emit(
       state.copyWith(
         pairingProcessState: PairingProcessState.notPairedYet,
@@ -77,5 +77,17 @@ class PairingCubit extends Cubit<PairingState> {
       return '-';
     }
     return pairingCode[index];
+  }
+
+  String getServerUri() => pairingService.getServerUri().host;
+
+  String generateQrCodeData() {
+    final Uri serverUri = pairingService.getServerUri();
+
+    final String qrCodeData = serverUri.replace(
+      path: '${pairingService.qrCodePairingEndpoint}${state.pairingData.tokenId}'
+    ).toString();
+
+    return qrCodeData;
   }
 }

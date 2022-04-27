@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:terminal_frontend/application/pairing/pairing_cubit.dart';
 import 'package:terminal_frontend/presentation/core/styles/styles.dart';
 
 class QrCodeInfo extends StatelessWidget {
-  static const String pairingEndpoint = "/pos/wallets/token/";
-  final String tokenId;
-  final Uri serverUri;
+  final PairingCubit pairingCubit;
 
   const QrCodeInfo({
     Key? key,
-    required this.serverUri,
-    required this.tokenId
+    required this.pairingCubit,
   }) : super(key: key);
 
   @override
@@ -25,7 +23,7 @@ class QrCodeInfo extends StatelessWidget {
             child: Center(
               child: Text(
                 "Please enter your pairing code "
-                "which can be generated here: '${serverUri.host}' "
+                "which can be generated here: '${pairingCubit.getServerUri()}' "
                 "or scan the QR-Code to pair your HPI-Token",
                 textAlign: TextAlign.center,
                 style: TextStyles.normalTextBlack,
@@ -36,7 +34,7 @@ class QrCodeInfo extends StatelessWidget {
           Expanded(
             child: Center(
               child: QrImage(
-                data: serverUri.replace(path: "$pairingEndpoint$tokenId").toString(),
+                data: pairingCubit.generateQrCodeData(),
                 version: 9,
                 size: 135,
                 errorCorrectionLevel: QrErrorCorrectLevel.Q,

@@ -1,5 +1,19 @@
 # Setting up the Raspberry Pi 
 
+## Physical Setup - Wiring
+
+We have to wire up the PN532 NFC Module. Depending on the protocol used we need to wire it up for either SPI or I2C. **I would always recommend to wire up for both protocols!**
+
+- Alwayse needed are the three wires for `VCC`, `GND` and `IRQ` (here `GPIO16`)
+- `I2C` needs the `SDA` and the `SCL` wires
+- `SPI` needs `MOSI`, `MISO`, `SCLK/SCK`, `CEO/SS`
+
+Just connect the corresponding wires from the PN532 with the Raspberry Pi (no fancy cross wiring just `SDA` -> `SDA`, `SCL` -> `SCL`, `MOSI` -> `MOSI`, ...) according to the following picture:
+
+![Raspberry Pi wiring setup](WiringPicture.png)
+
+- **NOTE: the bottom of this picture is where the USB-Ports of the Pi are and the right side is on the edge of the Pi!**
+
 ## WiFi
 ### Corporate wifi setup for `eduroam` (802.1X Standard)
 
@@ -45,7 +59,9 @@
 
 Detail instructions can be found [here](https://github.com/ardera/flutter-pi).
 
-1. Just copy and past the following script which is based on the official instructions (script last updated: 03.03.2022)
+1. Navigate to the home directory with: `cd`
+
+2. Just copy and past the following script which is based on the official instructions (script last updated: 03.03.2022)
 
     ```bash
     #!/bin/bash
@@ -98,32 +114,33 @@ Detail instructions can be found [here](https://github.com/ardera/flutter-pi).
     echo "You have to start at 'Building the asset bundle'"
     ```
 
-2. Open raspi-config:
+3. Open raspi-config:
     ```bash
     sudo raspi-config
     ```
     
-3. Switch to console mode:
+4. Switch to console mode:
    `System Options -> Boot / Auto Login` and select `Console (Autologin)`.
 
-4. **Raspbian buster only, skip this if you're on bullseye (or newer - which is normally the case)**  
+5. **Raspbian buster only, skip this if you're on bullseye (or newer - which is normally the case)**  
     Enable the V3D graphics driver:  
    `Advanced Options -> GL Driver -> GL (Fake KMS)`
 
-5. Configure the GPU memory
+6. Configure the GPU memory
    `Performance Options -> GPU Memory` and enter `64`.
 
-6. Enable SPI:
+6. Enable SPI and I2C:
    `Interface Options -> SPI -> Yes`
+   `Interface Options -> I2C -> Yes`
 
-7. Leave `raspi-config`.
+8. Leave `raspi-config`.
 
-8. Give the `pi` permission to use 3D acceleration - normally this is already done in the script but doing it again does no harm. (**NOTE:** potential security hazard. If you don't want to do this, launch `flutter-pi` using `sudo` instead.)
+9. Give the `pi` permission to use 3D acceleration - normally this is already done in the script but doing it again does no harm. (**NOTE:** potential security hazard. If you don't want to do this, launch `flutter-pi` using `sudo` instead.)
     ```bash
     sudo usermod -a -G render pi
     ```
 
-8. Finish and reboot: `sudo shutdown -r now`
+10. Finish and reboot: `sudo shutdown -r now`
 
 
 # Compiling the Flutter App for Raspberry Pi
@@ -155,7 +172,7 @@ flutter_terminal/
 ├─ README.md
 ```
 
-1. Install flutter on the system (just follow the instructions [here](https://docs.flutter.dev/get-started/install/linux)) - basically just: `sudo snap install flutter --classic`
+1. Install flutter on the system - **always make sure that the engine binaries version installed on the Raspberry Pi (when setting up `flutter-pi`) matches the Flutter version which is used to compile the app** - (just follow the instructions [here](https://docs.flutter.dev/get-started/install/linux)) - basically just: `sudo snap install flutter --classic`
 
 2. Now clone the engine binaries: `git clone --depth 1 https://github.com/ardera/flutter-engine-binaries-for-arm.git engine-binaries` <br>
 **Important check that the engine binaries version equals the used flutter verion (`flutter --version`)**
@@ -234,7 +251,7 @@ flutter_terminal/
     [Service]
     User=pi
     # Sometimes the flutter-pi path must be given in absolute form
-    ExecStart=flutter-pi --release %h/FsrTerminal
+    ExecStart=/home/pi/FsrTerminal/assets/StartScript.sh
     ExecStop=/usr/bin/killall flutter-pi
 
     # Always try to restart
@@ -253,13 +270,17 @@ flutter_terminal/
 
 4. Enable the service by executing `sudo systemctl enable fsr-terminal`
 
-5. When starting the service with `sudo systemctl start fsr-terminal` the app should start as normal otherwise see the `Troubleshooting` section below
+5. Make the `StartScript.sh` executable with: `sudo chmod 755 ~/FsrTerminal/assets/StartScript.sh`
 
-6. After a restart the system should automatically open the FSR Terminal
+6. When starting the service with `sudo systemctl start fsr-terminal` the app should start as normal otherwise see the `Troubleshooting` section below
+
+7. After a restart the system should automatically open the FSR Terminal
 
 ## Troubleshooting
 
 - Check the output of `systemctl status fsr-terminal`
+
+- Check the outputs of `journalctl -u fsr-terminal`
 
 - Make sure the `~/FsrTerminal` got the `755` permission with `sudo chmod 755 ~/FsrTerminal`
 
