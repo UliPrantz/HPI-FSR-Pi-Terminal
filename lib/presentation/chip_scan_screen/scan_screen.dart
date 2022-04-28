@@ -10,7 +10,7 @@ import 'package:terminal_frontend/application/start_screen/start_screen_cubit.da
 import 'package:terminal_frontend/application/start_screen/start_screen_state.dart';
 import 'package:terminal_frontend/infrastructure/chip_scan/chip_scan_service.dart';
 import 'package:terminal_frontend/presentation/app_router.dart';
-import 'package:terminal_frontend/presentation/core/app_bar.dart';
+import 'package:terminal_frontend/presentation/core/fsr_wallet_app_bar.dart';
 import 'package:terminal_frontend/presentation/core/styles/styles.dart';
 
 class ChipScanScreen extends StatelessWidget {

@@ -49,7 +49,8 @@ class CheckoutPreview extends StatelessWidget {
                     CheckoutPreviewButton(
                       callback: _clearShoppingCart, 
                       child: const Icon(
-                        Icons.clear
+                        Icons.clear,
+                        color: AppColors.black,
                       )
                     ),
 
@@ -64,10 +65,12 @@ class CheckoutPreview extends StatelessWidget {
                             padding: EdgeInsets.symmetric(horizontal: 1.0),
                             child: Text(
                               "Checkout",
+                              style: TextStyles.normalTextBlack,
                             ),
                           ),
                           Icon(
-                            Icons.arrow_forward
+                            Icons.arrow_forward,
+                            color: AppColors.black,
                           )
                         ],
                       ),

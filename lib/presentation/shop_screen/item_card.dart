@@ -31,27 +31,25 @@ class ItemCard extends StatelessWidget {
           onTap: onItemClicked,
           child: Stack(
             children: [              
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.file(
-                      coffeeMugFile,
-                      width: 100,
-                      height: 100,
-                    ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.file(
+                    coffeeMugFile,
+                    width: 90,
+                    height: 90,
+                  ),
         
-                    const Padding(padding: EdgeInsets.only(bottom: 12.0)),
-        
-                    Text(
-                      "${item.name}: ${item.price.toEuroString()}",
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.fade,
-                      style: TextStyles.normalTextBlackBold,
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        "${item.name}: ${item.price.toEuroString()}",
+                        textAlign: TextAlign.center,
+                        style: TextStyles.normalTextBlackBold,
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
         
               Positioned(

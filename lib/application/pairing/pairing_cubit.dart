@@ -53,7 +53,10 @@ class PairingCubit extends Cubit<PairingState> {
       String newCode = state.pairingData.pairingCode + character;
       
       final PairingState newState = 
-        state.copyWith(pairingData: state.pairingData.copyWith(pairingCode: newCode));
+        state.copyWith(
+          pairingProcessState: PairingProcessState.notPairedYet,
+          pairingData: state.pairingData.copyWith(pairingCode: newCode)
+        );
       emit(newState);
     }
   }
@@ -65,7 +68,10 @@ class PairingCubit extends Cubit<PairingState> {
     }
 
     PairingState newState = 
-      state.copyWith(pairingData: state.pairingData.copyWith(pairingCode: newCode));
+      state.copyWith(
+        pairingProcessState: PairingProcessState.notPairedYet,
+        pairingData: state.pairingData.copyWith(pairingCode: newCode)
+      );
     emit(newState);
   }
 
@@ -77,17 +83,5 @@ class PairingCubit extends Cubit<PairingState> {
       return '-';
     }
     return pairingCode[index];
-  }
-
-  String getServerUri() => pairingService.getServerUri().host;
-
-  String generateQrCodeData() {
-    final Uri serverUri = pairingService.getServerUri();
-
-    final String qrCodeData = serverUri.replace(
-      path: '${pairingService.qrCodePairingEndpoint}${state.pairingData.tokenId}'
-    ).toString();
-
-    return qrCodeData;
   }
 }

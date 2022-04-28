@@ -14,6 +14,7 @@ import 'package:terminal_frontend/domain/terminal_meta_data/item.dart';
 import 'package:terminal_frontend/domain/user/user.dart';
 import 'package:terminal_frontend/domain/user/user_service_interface.dart';
 import 'package:terminal_frontend/presentation/app_router.dart';
+import 'package:terminal_frontend/application/core/data_formatter_extension.dart';
 
 class ShoppingCubit extends Cubit<ShoppingState> {
   static const int secondsToShowCheckoutScreen = 3;
@@ -105,10 +106,17 @@ class ShoppingCubit extends Cubit<ShoppingState> {
   String createDescriptionString(Map<Item, int> itemMap) {
     final List<String> itemStrings = [];
     itemMap.forEach((key, value) {
-      itemStrings.add("$value x ${key.name}");
+      if (value != 0) {
+        itemStrings.add("$value x ${key.name}");
+      }
     });
-    return itemStrings.join(', ');
+
+    // Limiting the description to 100 characters 
+    // since this is required by the backend
+    return itemStrings.join(', ').limitCharacters(100, "...");
   }
+
+
 
   void clearShoppingCart() {
     int newItemCount = 0;

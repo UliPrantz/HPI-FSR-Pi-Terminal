@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:terminal_frontend/presentation/pairing_screen/numpad_base_button.dart';
 
 typedef KeyboardTapCallback = void Function(String text);
 
-class CalcButton extends StatelessWidget {
+class NumpadDigitButton extends StatelessWidget {
   final String value;
   final Color textColor;
   final KeyboardTapCallback onKeyboardTap;
 
-  const CalcButton(
+  const NumpadDigitButton(
     this.value,
     {Key? key, 
     required this.textColor,
@@ -16,23 +17,15 @@ class CalcButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(45),
-      onTap: () {
-        onKeyboardTap(value);
-      },
-      child: Container(
-        alignment: Alignment.center,
-        width: 60,
-        height: 30,
-        child: Text(
+    return NumpadBaseButton(
+      callback: () => onKeyboardTap(value), 
+      child: Text(
           value,
           style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.bold,
               color: textColor),
         ),
-      )
     );
   }
 }

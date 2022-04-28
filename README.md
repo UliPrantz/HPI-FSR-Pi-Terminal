@@ -130,7 +130,7 @@ Detail instructions can be found [here](https://github.com/ardera/flutter-pi).
    `Performance Options -> GPU Memory` and enter `64`.
 
 6. Enable SPI and I2C:
-   `Interface Options -> SPI -> Yes`
+   `Interface Options -> SPI -> Yes` and
    `Interface Options -> I2C -> Yes`
 
 8. Leave `raspi-config`.

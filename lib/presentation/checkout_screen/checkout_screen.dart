@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:terminal_frontend/presentation/core/app_bar.dart';
+import 'package:terminal_frontend/presentation/core/fsr_wallet_app_bar.dart';
 import 'package:terminal_frontend/presentation/core/format_extensions.dart';
 import 'package:terminal_frontend/presentation/core/styles/styles.dart';
 

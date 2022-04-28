@@ -63,6 +63,10 @@ class ChipScanService extends ChipScanServiceInterface {
     Timer? executionTimer;
 
     isolateChannel.stream.cast<IsolateCommand>().listen((command) {
+      // This line can be used to bypass the RFID reader and debug the app
+      // on a device which doesn't have a PN532
+      //isolateChannel.sink.add(ChipScanDto(uidData: [255, 255, 255, 255, 255, 255, 255]).toDomain());
+
       switch (command.type) {
         case IsolateCommandType.pathInformation:
           rfidReader = _getRfidReader(command.dyLibPath);

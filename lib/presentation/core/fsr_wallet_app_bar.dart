@@ -30,22 +30,24 @@ class FsrWalletAppBar extends AppBar {
     title: Builder(
       builder: (context) {
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             if (showLogout)
               AppBarButton(text: "Logout", callback: () => _logoutCallback(context)),
 
-            const Spacer(),
-
-            Text(
-              GetIt.I<StartScreenCubit>().state.terminalMetaData.name,
-              style: TextStyles.appBarText
+            Expanded(
+              flex: 2,
+              child: Text(
+                GetIt.I<StartScreenCubit>().state.terminalMetaData.name,
+                textAlign: TextAlign.center,
+                style: TextStyles.appBarText,
+                overflow: TextOverflow.fade,
+              ),
             ),
-            
-            const Spacer(),
 
             if (showPairing)
-              AppBarButton(text: "Pairing", callback: pairingPressedCallback!),
+              AppBarButton(text: "Link HPI acc.", callback: pairingPressedCallback!),
             if (showBack)
               AppBarButton(text: "Back", callback: () => _backCallback(context)),
           ],

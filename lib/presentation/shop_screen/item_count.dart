@@ -15,10 +15,10 @@ class ItemCount extends StatelessWidget {
     return ClipOval(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-        color: AppColors.blue,
+        color: AppColors.fsrYellow,
         child: Text(
           count.toString(),
-          style: TextStyles.normalTextWhite
+          style: TextStyles.normalTextBlackBold
         ),
       ),
     );

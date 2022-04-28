@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:terminal_frontend/presentation/pairing_screen/calc_button.dart';
+import 'package:terminal_frontend/presentation/pairing_screen/numpad_digit_button.dart';
+import 'package:terminal_frontend/presentation/pairing_screen/numpad_base_button.dart';
 
 class Numpad extends StatelessWidget {
   /// Color of the text [default = Colors.black]
@@ -10,13 +11,13 @@ class Numpad extends StatelessWidget {
   final Icon? rightIcon;
 
   /// Action to trigger when right button is pressed
-  final Function()? rightButtonFn;
+  final VoidCallback? rightButtonFn;
 
   /// Display a custom left icon
   final Icon? leftIcon;
 
   /// Action to trigger when left button is pressed
-  final Function()? leftButtonFn;
+  final VoidCallback? leftButtonFn;
 
   /// Callback when an item is pressed
   final KeyboardTapCallback onKeyboardTap;
@@ -42,50 +43,36 @@ class Numpad extends StatelessWidget {
       alignment: Alignment.center,
       child: Column(
         children: <Widget>[
-          ButtonBar(
-            alignment: mainAxisAlignment,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              CalcButton('1', textColor: textColor, onKeyboardTap: onKeyboardTap,),
-              CalcButton('2', textColor: textColor, onKeyboardTap: onKeyboardTap,),
-              CalcButton('3', textColor: textColor, onKeyboardTap: onKeyboardTap,),
+              NumpadDigitButton('1', textColor: textColor, onKeyboardTap: onKeyboardTap,),
+              NumpadDigitButton('2', textColor: textColor, onKeyboardTap: onKeyboardTap,),
+              NumpadDigitButton('3', textColor: textColor, onKeyboardTap: onKeyboardTap,),
             ],
           ),
-          ButtonBar(
-            alignment: mainAxisAlignment,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              CalcButton('4', textColor: textColor, onKeyboardTap: onKeyboardTap,),
-              CalcButton('5', textColor: textColor, onKeyboardTap: onKeyboardTap,),
-              CalcButton('6', textColor: textColor, onKeyboardTap: onKeyboardTap,),
+              NumpadDigitButton('4', textColor: textColor, onKeyboardTap: onKeyboardTap,),
+              NumpadDigitButton('5', textColor: textColor, onKeyboardTap: onKeyboardTap,),
+              NumpadDigitButton('6', textColor: textColor, onKeyboardTap: onKeyboardTap,),
             ],
           ),
-          ButtonBar(
-            alignment: mainAxisAlignment,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              CalcButton('7', textColor: textColor, onKeyboardTap: onKeyboardTap,),
-              CalcButton('8', textColor: textColor, onKeyboardTap: onKeyboardTap,),
-              CalcButton('9', textColor: textColor, onKeyboardTap: onKeyboardTap,),
+              NumpadDigitButton('7', textColor: textColor, onKeyboardTap: onKeyboardTap,),
+              NumpadDigitButton('8', textColor: textColor, onKeyboardTap: onKeyboardTap,),
+              NumpadDigitButton('9', textColor: textColor, onKeyboardTap: onKeyboardTap,),
             ],
           ),
-          ButtonBar(
-            alignment: mainAxisAlignment,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              InkWell(
-                  borderRadius: BorderRadius.circular(45),
-                  onTap: leftButtonFn,
-                  child: Container(
-                      alignment: Alignment.center,
-                      width: 50,
-                      height: 50,
-                      child: leftIcon)),
-              CalcButton('0', textColor: textColor, onKeyboardTap: onKeyboardTap,),
-              InkWell(
-                  borderRadius: BorderRadius.circular(45),
-                  onTap: rightButtonFn,
-                  child: Container(
-                      alignment: Alignment.center,
-                      width: 50,
-                      height: 50,
-                      child: rightIcon))
+              NumpadBaseButton(callback: leftButtonFn, child: leftIcon),
+              NumpadDigitButton('0', textColor: textColor, onKeyboardTap: onKeyboardTap,),
+              NumpadBaseButton(callback: rightButtonFn, child: rightIcon),
             ],
           ),
         ],

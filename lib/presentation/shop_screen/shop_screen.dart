@@ -11,7 +11,7 @@ import 'package:terminal_frontend/domain/user/user.dart';
 import 'package:terminal_frontend/infrastructure/shopping/shopping_service.dart';
 import 'package:terminal_frontend/infrastructure/user/user_serivce.dart';
 import 'package:terminal_frontend/presentation/app_router.dart';
-import 'package:terminal_frontend/presentation/core/app_bar.dart';
+import 'package:terminal_frontend/presentation/core/fsr_wallet_app_bar.dart';
 import 'package:terminal_frontend/presentation/core/styles/colors.dart';
 import 'package:terminal_frontend/presentation/shop_screen/balance_view.dart';
 import 'package:terminal_frontend/presentation/shop_screen/checkout_preview.dart';

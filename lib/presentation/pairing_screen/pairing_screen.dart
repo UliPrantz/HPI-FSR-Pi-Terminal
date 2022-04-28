@@ -8,14 +8,17 @@ import 'package:terminal_frontend/application/pairing/pairing_cubit.dart';
 import 'package:terminal_frontend/application/pairing/pairing_state.dart';
 import 'package:terminal_frontend/domain/user/user.dart';
 import 'package:terminal_frontend/infrastructure/pairing/pairing_service.dart';
-import 'package:terminal_frontend/presentation/core/app_bar.dart';
+import 'package:terminal_frontend/presentation/core/fsr_wallet_app_bar.dart';
 import 'package:terminal_frontend/presentation/core/snack_bar.dart';
 import 'package:terminal_frontend/presentation/core/styles/colors.dart';
 import 'package:terminal_frontend/presentation/pairing_screen/numpad.dart';
 import 'package:terminal_frontend/presentation/pairing_screen/pairing_code_display.dart';
-import 'package:terminal_frontend/presentation/pairing_screen/qr_code_info.dart';
+import 'package:terminal_frontend/presentation/pairing_screen/pairing_info_text.dart';
+import 'package:terminal_frontend/presentation/pairing_screen/pairing_succeeded_overlay.dart';
 
 class PairingScreen extends StatelessWidget {
+  static const int millisecondsToShowPairingSucceededConfirmation = 1500;
+
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
 
   final String tokenId;
@@ -41,10 +44,8 @@ class PairingScreen extends StatelessWidget {
         appBar: FsrWalletAppBar(showLogout: true, showBack: true,),
         body: Row(
           children: [
-            Expanded(
-              child: QrCodeInfo(
-                pairingCubit: pairingCubit,
-              )
+            const Expanded(
+              child: PairingInfoText()
             ),
 
             Container(
@@ -89,19 +90,35 @@ class PairingScreen extends StatelessWidget {
     pairingCubit.pairChip();
   }
 
-  void pairingStateChanged(BuildContext context, PairingState state) {
+  void pairingStateChanged(BuildContext context, PairingState state) async {
     switch (state.pairingProcessState) {
       case PairingProcessState.notPairedYet:
         break;
+      
       case PairingProcessState.pairingNotPossible:
         showSnackBar(scaffoldKey: scaffoldKey, text: "Pairing currently not possible. Please try later again.");
         break;
+      
       case PairingProcessState.pairingTokenNotFound:
         showSnackBar(scaffoldKey: scaffoldKey, text: "Pairing-Token was not found or is already expired/used.");
         break;
+
       case PairingProcessState.pairingSucceeded:
+        await showSuccessDialog(context);
         AutoRouter.of(context).pop<User>(state.user);
         break;
     }
+  }
+
+  Future<void> showSuccessDialog(BuildContext context) async {
+    final OverlayEntry overlayEntry = OverlayEntry(
+      builder: (_) => const PairingSucceededOverlay()
+    );
+
+    Overlay.of(context)?.insert(overlayEntry);
+
+    await Future.delayed(const Duration(milliseconds: millisecondsToShowPairingSucceededConfirmation));
+
+    overlayEntry.remove();
   }
 }

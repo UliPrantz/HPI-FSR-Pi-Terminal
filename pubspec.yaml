@@ -13,8 +13,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-  qr_flutter: ^4.0.0
-
   auto_route: ^3.2.2
 
   get_it: ^7.2.0
