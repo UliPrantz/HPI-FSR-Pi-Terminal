@@ -52,7 +52,7 @@ app.*.map.json
 *.gr.dart
 
 # Ignore the enviorment file to protect credentials
-/assets/env.yaml
+env.yaml
 
 ### MacOs related stuff ###
 # General

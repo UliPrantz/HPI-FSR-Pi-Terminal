@@ -26,8 +26,7 @@ dependencies:
 
   stream_channel: ^2.1.0
   ffi: ^1.1.2
-  dart_periphery: 
-    path: /Users/uli/Desktop/dart_periphery
+  dart_periphery: ^0.9.1
 
 
 dev_dependencies:

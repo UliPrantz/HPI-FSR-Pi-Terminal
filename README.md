@@ -15,7 +15,7 @@ Just connect the corresponding wires from the PN532 with the Raspberry Pi (no fa
 - **NOTE: the bottom of this picture is where the USB-Ports of the Pi are and the right side is on the edge of the Pi!**
 
 ## WiFi
-### Corporate wifi setup for `eduroam` (802.1X Standard)
+### 1st Option: Corporate wifi setup for `eduroam` (802.1X Standard)
 
 1. First setup the `wpa_supplicant.conf` which is located in `/etc/wpa_supplicant` (full path is `/etc/wpa_supplicant/wpa_supplicant.conf`)<br>
     Past the following content into the file:
@@ -33,6 +33,19 @@ Just connect the corresponding wires from the PN532 with the Raspberry Pi (no fa
     **Replace the [...] with your Username and Password!**
 
 2. Reboot the pi
+
+### 2nd Option: PSK WiFi Setup (e. g. HPI Foyer Wifi)
+
+1. You have to do this as actual root **(sudo won't work here!)**. Become sudo by entering:
+  `sudo -i`
+
+2. Configure the wifi with:
+  `wpa_passphrase "WLAN-NAME" "WLAN-PASSWORT" >> /etc/wpa_supplicant/wpa_supplicant.conf`
+
+3. Exit the root user:
+  `exit`
+
+4. Reboot: `sudo reboot`
 
 ### Troubleshooting
 
@@ -120,11 +133,11 @@ Detail instructions can be found [here](https://github.com/ardera/flutter-pi).
     ```
     
 4. Switch to console mode:
-   `System Options -> Boot / Auto Login` and select `Console (Autologin)`.
+   `System Options -> Boot / Auto Login` and select `Console`.
 
-5. **Raspbian buster only, skip this if you're on bullseye (or newer - which is normally the case)**  
+5. **Raspbian buster only, skip this if you're on bullseye (or newer - which is normally the case) - if you encoutner an `[flutter-pi] Could not query DRM device list: No such file or directory` error try this setting too**  
     Enable the V3D graphics driver:  
-   `Advanced Options -> GL Driver -> GL (Fake KMS)`
+   `Advanced Options -> GL Driver -> GL (Full KMS)`
 
 6. Configure the GPU memory
    `Performance Options -> GPU Memory` and enter `64`.
@@ -135,7 +148,7 @@ Detail instructions can be found [here](https://github.com/ardera/flutter-pi).
 
 8. Leave `raspi-config`.
 
-9. Give the `pi` permission to use 3D acceleration - normally this is already done in the script but doing it again does no harm. (**NOTE:** potential security hazard. If you don't want to do this, launch `flutter-pi` using `sudo` instead.)
+9. Give the `pi` permission to use 3D acceleration - normally this is already done in the script but doing it again does no harm. (**NOTE:** potential security hazard. If you don't want to do this, launch `flutter-pi` using `sudo` instead - the flutter-pi script above usally already enabled this!)
     ```bash
     sudo usermod -a -G render pi
     ```
@@ -143,7 +156,7 @@ Detail instructions can be found [here](https://github.com/ardera/flutter-pi).
 10. Finish and reboot: `sudo shutdown -r now`
 
 
-# Compiling the Flutter App for Raspberry Pi
+# Compiling the Flutter App for Raspberry Pi (not needed if you use the precompiled app from `release_build` - See info section [Precompiled App](#using-the-precompiled-app))
 
 > **IMPORTANT:** Do all this on a Linux `x86_64` machine which is **not** the Raspberry Pi (since the Pi is `arm`!) <br>
 > For performance reason you could also execute every command on any development machine **except for the third step in `Compiling the app`** since the `gen_snapshot_linux_x64_release` executable is only compiled for `x64` as the name says
@@ -183,9 +196,11 @@ flutter_terminal/
 
 5. Edit the `env.example.yaml` in a way that it works for you and copy/rename it to `env.yaml` for example with: `mv env.example.yaml env.yaml`
 
-6. Generate all the files that need code generation with: `flutter pub run build_runner build`
+6. Get all the flutter packages with `flutter pub get`
 
-7. Build the flutter bundle with: `flutter build bundle`
+7. Generate all the files that need code generation with: `flutter pub run build_runner build`
+
+8. Build the flutter bundle with: `flutter build bundle`
 
 ## Compiling the app
 
@@ -228,6 +243,17 @@ flutter_terminal/
 
 - Copying everything into `~/FsrTerminal` on the Pi by executing `rsync -a ./build/flutter_assets/ pi@raspberrypi.local:~/FsrTerminal/`
 
+
+# Using the precompiled app
+
+1. Copy the precompiled app from this repo to the Pi or clone it on the Pi and copy the `release_build/FsrTerminal` directory to `/home/pi`. Now the following path should exist: `/home/pi/FsrTerminal`!
+
+2. Inside the `FsrTerminal` rename the `assets/env.example.yaml` to `env.yaml` by executing:
+  `mv assets/env.example.yaml assets/env.yaml`
+
+3. Edit the `assets/env.yaml` file according to your setup!
+
+
 # Enabling app start after boot up
 
 ## Creating the `systemd` entry
@@ -243,9 +269,9 @@ flutter_terminal/
 
     # Getting a little fancy with the restart options here
     # The next 3 options are tightly connected to each other
-    # Give up restarting and exec StartLimitAction - if it fails 2 times (=StartLimitBurst) within 60 (=StartLimitIntervalSec) seconds
-    StartLimitBurst=2 
-    StartLimitIntervalSec=60
+    # Give up restarting and exec StartLimitAction - if it fails 15 times (=StartLimitBurst) within 300 (=StartLimitIntervalSec) seconds
+    StartLimitBurst=15 
+    StartLimitIntervalSec=300
     StartLimitAction=reboot-force
 
     [Service]
@@ -281,6 +307,8 @@ flutter_terminal/
 - Check the output of `systemctl status fsr-terminal`
 
 - Check the outputs of `journalctl -u fsr-terminal`
+
+- Check what happens when you execute the command executed by the start up service - look in `/etc/systemd/system/fsr-terminal.service` for `ExecStart=...`
 
 - Make sure the `~/FsrTerminal` got the `755` permission with `sudo chmod 755 ~/FsrTerminal`
 

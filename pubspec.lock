@@ -186,10 +186,10 @@ packages:
   dart_periphery:
     dependency: "direct main"
     description:
-      path: "/Users/uli/Desktop/dart_periphery"
-      relative: false
-    source: path
-    version: "0.8.29"
+      name: dart_periphery
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.9.1"
   dart_style:
     dependency: transitive
     description:
