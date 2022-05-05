@@ -1,3 +1,12 @@
+# The Raspberry Pi Terminal Interface
+
+## The finished Terminal with 3D cutted case and RFID reader
+![Finished Raspberry Pi Terminal](FinishedTerminal.png)
+
+## A small sample video of the UI in use
+![Terminal Interface Video](TerminalInterface.mp4)
+
+
 # Setting up the Raspberry Pi 
 
 ## Physical Setup - Wiring
