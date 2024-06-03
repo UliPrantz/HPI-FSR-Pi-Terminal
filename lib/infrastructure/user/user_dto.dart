@@ -6,7 +6,7 @@ part 'user_dto.g.dart';
 @JsonSerializable()
 class UserDto {
   @JsonKey(name: 'id')
-  final String? uuid;
+  final int? userId;
 
   @JsonKey(name: 'token_id')
   final String tokenId;
@@ -19,27 +19,32 @@ class UserDto {
   @JsonKey(name: 'paired_user')
   final String? username;
 
+  @JsonKey(name: 'pairing_url')
+  final String? pairingURL;
+
   UserDto({
-    this.uuid,
+    this.userId,
     required this.tokenId,
     this.creationDate,
     required this.balance,
     this.username,
+    this.pairingURL,
   });
 
   User toDomain() {
     return User(
-      uuid: uuid, 
-      tokenId: tokenId, 
-      creationDate: creationDate, 
+      userId: userId,
+      tokenId: tokenId,
+      creationDate: creationDate,
       balance: balance,
       username: username,
+      pairingURL: pairingURL,
     );
   }
 
   factory UserDto.fromJson(Map<String, dynamic> json) {
     // remove the data wrapper
-    json = json['data'];
+    // json = json['data'];
     return _$UserDtoFromJson(json);
   }
 }

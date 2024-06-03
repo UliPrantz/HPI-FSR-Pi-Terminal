@@ -11,8 +11,9 @@ import 'package:terminal_frontend/presentation/core/styles/styles.dart';
 import 'package:terminal_frontend/presentation/start_screen/error_widget.dart';
 import 'package:terminal_frontend/presentation/start_screen/loading_widget.dart';
 
+@RoutePage()
 class StartScreen extends StatelessWidget {
-  const StartScreen({ Key? key }) : super(key: key);
+  const StartScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,14 +21,15 @@ class StartScreen extends StatelessWidget {
       bloc: GetIt.I<StartScreenCubit>(),
       listener: (context, state) {
         if (state.loadingState == LoadingState.loadingSucceeded) {
-          AutoRouter.of(context).replace(ChipScanScreenRoute());
+          AutoRouter.of(context).replace(ChipScanRoute());
         }
       },
       builder: (context, state) {
         return Scaffold(
           backgroundColor: AppColors.darkGrey,
-          body: state.loadingState != LoadingState.loadingFailed ? 
-                          const LoadingWidget() : const ErrorWidget(),
+          body: state.loadingState != LoadingState.loadingFailed
+              ? const LoadingWidget()
+              : const ErrorWidget(),
         );
       },
     );

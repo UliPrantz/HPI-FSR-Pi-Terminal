@@ -10,18 +10,16 @@ void main() async {
 }
 
 class WalletTerminalApp extends StatelessWidget {
-  WalletTerminalApp({Key? key}) : super(key: key);
+  WalletTerminalApp({super.key});
 
-  final _appRouter = AppRouter(); 
+  final _appRouter = AppRouter();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'FSR-Wallet-Terminal',
       scrollBehavior: AlwaysDragScrollBehavior(),
-      routerDelegate: _appRouter.delegate(),
-      routeInformationProvider: _appRouter.routeInfoProvider(),
-      routeInformationParser: _appRouter.defaultRouteParser(),
+      routerConfig: _appRouter.config(),
     );
   }
 }
@@ -29,9 +27,9 @@ class WalletTerminalApp extends StatelessWidget {
 class AlwaysDragScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
   @override
-  Set<PointerDeviceKind> get dragDevices => { 
-    PointerDeviceKind.touch,
-    PointerDeviceKind.mouse,
-    // etc.
-  };
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        // etc.
+      };
 }

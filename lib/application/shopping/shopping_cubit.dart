@@ -23,7 +23,7 @@ class ShoppingCubit extends Cubit<ShoppingState> {
   final UserServiceInterface userService;
 
   ShoppingCubit({
-    required this.shoppingService, 
+    required this.shoppingService,
     required this.userService,
     required String tokenId,
     required String tag,
@@ -32,62 +32,42 @@ class ShoppingCubit extends Cubit<ShoppingState> {
     getUserBalance();
   }
 
-  bool get showPairingButton {
-    switch (state.userState) {
-      case UserState.loadingUser:
-      case UserState.loadingUserFailed:
-      case UserState.loadedPairedUser:
-        return false;
-      case UserState.loadedaAnonymousUser:
-        return true;
-    }
-  }
-
   void getUserBalance() async {
     final String tokenId = state.user.tokenId;
-    final Either<HttpFailure, User> result = await userService.getUserInfo(tokenId);
+    final Either<HttpFailure, User> result =
+        await userService.getUserInfo(tokenId);
 
-    result.fold(
-      (failure) {
-        final UserState newUserState = failure is UserNotFound ? 
-            UserState.loadedaAnonymousUser : UserState.loadingUserFailed;
+    result.fold((failure) {
+      final UserState newUserState = failure is UserNotFound
+          ? UserState.missingUser
+          : UserState.loadingUserFailed;
 
-        emit(
-          state.copyWith(
-            userState: newUserState,
-            user: state.user.copyWith(tokenId: tokenId),
-          )
-        );
-      }, 
-      (user) {
-        final UserState newUserState = 
-          user.username == null ? 
-          UserState.loadedaAnonymousUser : UserState.loadedPairedUser;
+      emit(state.copyWith(
+        userState: newUserState,
+        user: state.user.copyWith(tokenId: tokenId),
+      ));
+    }, (user) {
+      final UserState newUserState = user.username == null
+          ? UserState.missingUser
+          : UserState.loadedPairedUser;
 
-        emit(state.copyWith(
-          userState: newUserState,
-          user: user
-        ));
-      }
-    );
+      emit(state.copyWith(userState: newUserState, user: user));
+    });
   }
 
   void registerUserFromPairing(User user) {
-    emit(
-      state.copyWith(
-        userState: UserState.loadedPairedUser,
-        user: user
-      )
-    );
+    emit(state.copyWith(userState: UserState.loadedPairedUser, user: user));
   }
 
   void addItemToCart(Item item) {
     int newItemCount = state.shoppingData.overallItemCount + 1;
     int newPurchaseCost = state.shoppingData.purchaseCost + item.price;
-    Map<Item, int> tmpSelectedItems = Map.from(state.shoppingData.selectedItems);
-    
+    Map<Item, int> tmpSelectedItems =
+        Map.from(state.shoppingData.selectedItems);
+
     // increase the counter of the corresponding item
-    if (tmpSelectedItems.containsKey(item)) { //actually this should always be true!
+    if (tmpSelectedItems.containsKey(item)) {
+      //actually this should always be true!
       tmpSelectedItems[item] = tmpSelectedItems[item]! + 1;
     }
 
@@ -103,6 +83,10 @@ class ShoppingCubit extends Cubit<ShoppingState> {
     emit(state.copyWith(shoppingData: newShoppingData));
   }
 
+  bool canCheckout() {
+    return state.shoppingData.overallItemCount > 0;
+  }
+
   String createDescriptionString(Map<Item, int> itemMap) {
     final List<String> itemStrings = [];
     itemMap.forEach((key, value) {
@@ -111,21 +95,16 @@ class ShoppingCubit extends Cubit<ShoppingState> {
       }
     });
 
-    // Limiting the description to 100 characters 
+    // Limiting the description to 100 characters
     // since this is required by the backend
     return itemStrings.join(', ').limitCharacters(100, "...");
   }
-
-
 
   void clearShoppingCart() {
     int newItemCount = 0;
     int newPurchaseCost = 0;
     Map<Item, int> resetedMap = Map.from(
-      state.shoppingData.selectedItems.map(
-        (key, value) => MapEntry(key, 0)
-      )
-    );
+        state.shoppingData.selectedItems.map((key, value) => MapEntry(key, 0)));
 
     final ShoppingData newShoppingData = state.shoppingData.copyWith(
       overallItemCount: newItemCount,
@@ -137,16 +116,19 @@ class ShoppingCubit extends Cubit<ShoppingState> {
   }
 
   int checkout() {
-    assert(state.userState != UserState.loadingUser, "Always wait until some kind of data is loaded before calling checkout!");
-    shoppingService.sendCheckoutTransaction(state.shoppingData, state.user.tokenId);
-    
+    assert(state.userState != UserState.loadingUser,
+        "Always wait until some kind of data is loaded before calling checkout!");
+    shoppingService.sendCheckoutTransaction(
+        state.shoppingData, state.user.tokenId);
+
     int newBalance = state.user.balance - state.shoppingData.purchaseCost;
     return newBalance;
   }
 
   void showCheckoutScreen(BuildContext context, int newBalance) {
-    AutoRouter.of(context).push(CheckoutScreenRoute(newBalance: newBalance));
-    
+    AutoRouter.of(context).push(CheckoutRoute(
+        newBalance: newBalance, username: state.user.username ?? ""));
+
     // register a future which navigates back to the chip scan screen
     Future.delayed(const Duration(seconds: secondsToShowCheckoutScreen), () {
       logoutRoute(context);

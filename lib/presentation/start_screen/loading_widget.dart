@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:terminal_frontend/presentation/core/styles/styles.dart';
 
 class LoadingWidget extends StatefulWidget {
-  const LoadingWidget({ Key? key }) : super(key: key);
+  const LoadingWidget({ super.key });
 
   @override
   State<LoadingWidget> createState() => _LoadingWidgetState();

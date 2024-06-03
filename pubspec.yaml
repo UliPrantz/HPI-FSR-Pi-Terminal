@@ -6,40 +6,40 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 0.0.1
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.17.0 <3.0.0"
 
 
 dependencies:
   flutter:
     sdk: flutter
 
-  auto_route: ^3.2.2
+  auto_route: ^7.8.4
 
   get_it: ^7.2.0
 
   flutter_bloc: ^8.0.0
   equatable: ^2.0.3
-  fpdart: ^0.0.12
-  http: ^0.13.4
-  json_annotation: ^4.4.0
+  fpdart: ^1.1.0
+  http: ^1.2.1
+  json_annotation: ^4.8.1
   yaml: ^3.1.0
 
   stream_channel: ^2.1.0
-  ffi: ^1.1.2
-  dart_periphery: ^0.9.1
+  ffi: ^2.1.2
+  dart_periphery: ^0.9.5
+  qr_flutter: ^4.1.0
+  bloc: ^8.1.3
 
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
 
-  flutter_lints: ^1.0.0
-  build_runner: ^2.1.5
+  flutter_lints: ^3.0.1
+  build_runner:
 
   mockito: ^5.0.16
 
   json_serializable: ^6.1.0
-  auto_route_generator: ^3.1.0
+  auto_route_generator: ^7.3.2
 
 
 flutter:
@@ -50,4 +50,3 @@ flutter:
     - assets/env.yaml
     - assets/StartScript.sh
     - assets/libperiphery_arm.so
-

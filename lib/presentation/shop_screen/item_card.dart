@@ -16,11 +16,7 @@ class ItemCard extends StatelessWidget {
   final ShoppingCubit shoppingCubit;
   final Item item;
 
-  ItemCard({
-    Key? key, 
-    required this.shoppingCubit, 
-    required this.item
-  }) : super(key: key);
+  ItemCard({super.key, required this.shoppingCubit, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -30,34 +26,40 @@ class ItemCard extends StatelessWidget {
         child: InkWell(
           onTap: onItemClicked,
           child: Stack(
-            children: [              
+            children: [
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.file(
-                    coffeeMugFile,
-                    width: 90,
-                    height: 90,
-                  ),
-        
                   Expanded(
                     child: Center(
-                      child: Text(
-                        "${item.name}: ${item.price.toEuroString()}",
-                        textAlign: TextAlign.center,
-                        style: TextStyles.normalTextBlackBold,
-                      ),
-                    ),
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          item.name,
+                          textAlign: TextAlign.center,
+                          style: TextStyles.boldTextMediumDark,
+                        ),
+                        Text(
+                          item.price.toEuroString(),
+                          textAlign: TextAlign.center,
+                          style: TextStyles.normalTextBlackBold,
+                        ),
+                      ],
+                    )),
                   ),
                 ],
               ),
-        
-              Positioned(
-                top: 5.0,
-                right: 5.0,
-                // accessing the item map and giving default value 0
-                child: ItemCount(count: shoppingCubit.state.shoppingData.selectedItems[item] ?? 0),
-              ),
+              if (shoppingCubit.state.shoppingData.selectedItems[item]! > 0)
+                Positioned(
+                  bottom: 5.0,
+                  right: 5.0,
+                  // accessing the item map and giving default value 0
+                  child: ItemCount(
+                      count: shoppingCubit
+                              .state.shoppingData.selectedItems[item] ??
+                          0),
+                ),
             ],
           ),
         ),

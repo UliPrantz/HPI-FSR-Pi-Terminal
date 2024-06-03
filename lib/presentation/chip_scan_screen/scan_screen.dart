@@ -9,40 +9,58 @@ import 'package:terminal_frontend/application/chip_scan/chip_scan_state.dart';
 import 'package:terminal_frontend/application/start_screen/start_screen_cubit.dart';
 import 'package:terminal_frontend/application/start_screen/start_screen_state.dart';
 import 'package:terminal_frontend/infrastructure/chip_scan/chip_scan_service.dart';
+import 'package:terminal_frontend/injection_container.dart';
 import 'package:terminal_frontend/presentation/app_router.dart';
 import 'package:terminal_frontend/presentation/core/fsr_wallet_app_bar.dart';
 import 'package:terminal_frontend/presentation/core/styles/styles.dart';
 
+@RoutePage()
 class ChipScanScreen extends StatelessWidget {
-  final ChipScanCubit chipScanCubit = ChipScanCubit(
-    chipScanService: GetIt.I<ChipScanService>()
-  );
+  final ChipScanCubit chipScanCubit =
+      ChipScanCubit(chipScanService: GetIt.I<ChipScanService>());
 
-  ChipScanScreen({ Key? key }) : super(key: key);
+  ChipScanScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    bool allowManualTokenInput = GetIt.I<EnvironmentConfig>().allowManualToken;
+
     return BlocListener<ChipScanCubit, ChipScanState>(
       bloc: chipScanCubit,
       listener: _chipScanStateChanged,
       child: BlocBuilder<StartScreenCubit, StartScreenState>(
-        bloc: GetIt.I<StartScreenCubit>(),
-        builder: (context, state) {
-          return Scaffold(
-            appBar: FsrWalletAppBar(),
-            body: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.0),
-              child: Center(
-                child: Text(
-                  "Please put your transponder in front of the reader",
-                  style: TextStyles.mainTextBig,
-                  textAlign: TextAlign.center
+          bloc: GetIt.I<StartScreenCubit>(),
+          builder: (context, state) {
+            return Scaffold(
+              backgroundColor: AppColors.mainColor,
+              appBar: FsrWalletAppBar(),
+              body: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Please put your transponder in front of the reader",
+                          style: TextStyles.mainTextBigBright,
+                          textAlign: TextAlign.center),
+                      allowManualTokenInput
+                          ? TextField(
+                              autocorrect: false,
+                              onSubmitted: (value) =>
+                                  manualInput(context, value),
+                              decoration: const InputDecoration(
+                                  labelText:
+                                      "Manual input (Press ENTER to submit)",
+                                  labelStyle: TextStyles.normalTextWhite),
+                              style: TextStyles.normalTextWhite,
+                            )
+                          : Container(),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        }
-      ),
+            );
+          }),
     );
   }
 
@@ -50,13 +68,17 @@ class ChipScanScreen extends StatelessWidget {
     if (state.chipDataAvailable) {
       chipScanCubit.stopListingForChipData();
 
-      AutoRouter.of(context).push(
-        ShopScreenRoute(
+      AutoRouter.of(context).push(ShopRoute(
           tokenId: state.chipScanData.uuid,
           items: GetIt.I<StartScreenCubit>().state.terminalMetaData.items,
-          tag: "coffee"
-        )
-      );
+          tag: "coffee"));
     }
+  }
+
+  void manualInput(BuildContext context, String value) {
+    AutoRouter.of(context).push(ShopRoute(
+        tokenId: value,
+        items: GetIt.I<StartScreenCubit>().state.terminalMetaData.items,
+        tag: "coffee"));
   }
 }

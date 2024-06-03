@@ -4,7 +4,7 @@ import 'package:terminal_frontend/application/start_screen/start_screen_cubit.da
 import 'package:terminal_frontend/presentation/core/styles/styles.dart';
 
 class ErrorWidget extends StatelessWidget {
-  const ErrorWidget({Key? key}) : super(key: key);
+  const ErrorWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class ErrorWidget extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.only(bottom: 20.0),
           ),
-      
+
           ElevatedButton(
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all<Color>(AppColors.white),
@@ -32,7 +32,7 @@ class ErrorWidget extends StatelessWidget {
                 )
               )
             ),
-            onPressed: GetIt.I<StartScreenCubit>().retry, 
+            onPressed: GetIt.I<StartScreenCubit>().retry,
             child: const Text(
               "Retry",
               style: TextStyles.errorButtonTextStyle

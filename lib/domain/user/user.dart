@@ -1,34 +1,37 @@
 import 'package:equatable/equatable.dart';
 
 class User with EquatableMixin {
-  final String? uuid;
+  final int? userId;
   final String tokenId;
   final DateTime? creationDate;
   final int balance;
   final String? username;
+  final String? pairingURL;
 
   User({
-    this.uuid,
+    this.userId,
     required this.tokenId,
     this.creationDate,
     required this.balance,
     this.username,
+    this.pairingURL,
   });
 
-  User.empty({String? tokenId}) : this(
-    tokenId: tokenId ?? "",
-    balance: 0,
-  );
+  User.empty({String? tokenId})
+      : this(
+          tokenId: tokenId ?? "",
+          balance: 0,
+        );
 
   User copyWith({
-    final String? uuid,
+    final int? userId,
     final String? tokenId,
     final DateTime? creationDate,
     final int? balance,
     final String? username,
   }) {
     return User(
-      uuid: uuid ?? this.uuid,
+      userId: userId ?? this.userId,
       tokenId: tokenId ?? this.tokenId,
       creationDate: creationDate ?? this.creationDate,
       balance: balance ?? this.balance,
@@ -37,5 +40,5 @@ class User with EquatableMixin {
   }
 
   @override
-  List<Object?> get props => [uuid, tokenId, creationDate, balance, username];
+  List<Object?> get props => [userId, tokenId, creationDate, balance, username];
 }

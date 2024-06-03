@@ -6,21 +6,15 @@ class ItemCount extends StatelessWidget {
   final int count;
 
   const ItemCount({
-    Key? key,
+    super.key,
     required this.count,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ClipOval(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-        color: AppColors.fsrYellow,
-        child: Text(
-          count.toString(),
-          style: TextStyles.normalTextBlackBold
-        ),
-      ),
+    return ElevatedButton(
+      onPressed: null,
+      child: Text(count.toString(), style: TextStyles.normalTextBlackBold),
     );
   }
 }

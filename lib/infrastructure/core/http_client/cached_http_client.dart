@@ -5,8 +5,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:terminal_frontend/infrastructure/core/http_client/response.dart';
 
-
-/// This class needs an inner [HttpClient] which is used to make the all 
+/// This class needs an inner [HttpClient] which is used to make the all
 /// the requests under the hood!
 /// Most behavior of this class is also copied from the http.BaseClient since
 /// there is no protected in dart to hide extended methods.
@@ -34,51 +33,47 @@ class CachedHttpClient {
 
   Uri get serverUri => _host!;
 
-  Future<Response> get(
-    String endpoint, 
-    {Map<String, String>? headers, 
-    bool retry=false}) =>
+  Future<Response> get(String endpoint,
+          {Map<String, String>? headers, bool retry = false}) =>
       _sendUnstreamed('GET', endpoint, headers, retry);
 
   Future<Response> post(String endpoint,
-          {Map<String, String>? headers, 
-          Object? body, 
-          Encoding? encoding, 
-          bool retry=false}) =>
+          {Map<String, String>? headers,
+          Object? body,
+          Encoding? encoding,
+          bool retry = false}) =>
       _sendUnstreamed('POST', endpoint, headers, retry, body, encoding);
 
   Future<Response> put(String endpoint,
-          {Map<String, String>? headers, 
-          Object? body, 
-          Encoding? encoding, 
-          bool retry=false}) =>
+          {Map<String, String>? headers,
+          Object? body,
+          Encoding? encoding,
+          bool retry = false}) =>
       _sendUnstreamed('PUT', endpoint, headers, retry, body, encoding);
 
   Future<Response> patch(String endpoint,
-          {Map<String, String>? headers, 
-          Object? body, 
-          Encoding? encoding, 
-          bool retry=false}) =>
+          {Map<String, String>? headers,
+          Object? body,
+          Encoding? encoding,
+          bool retry = false}) =>
       _sendUnstreamed('PATCH', endpoint, headers, retry, body, encoding);
 
   Future<Response> delete(String endpoint,
-          {Map<String, String>? headers, 
-          Object? body, 
-          Encoding? encoding, 
-          bool retry=false}) =>
+          {Map<String, String>? headers,
+          Object? body,
+          Encoding? encoding,
+          bool retry = false}) =>
       _sendUnstreamed('DELETE', endpoint, headers, retry, body, encoding);
 
   /// Sends a non-streaming [Request] and returns a non-streaming [Response].
-  Future<Response> _sendUnstreamed(
-      String method, 
-      String endpoint, 
-      Map<String, String>? requestHeaders,
-      bool retry,
+  Future<Response> _sendUnstreamed(String method, String endpoint,
+      Map<String, String>? requestHeaders, bool retry,
       [body, Encoding? encoding]) async {
     final Uri url = Uri(
       scheme: _host!.scheme,
       host: _host!.host,
-      path: endpoint,
+      port: _host!.port,
+      path: _host!.path + endpoint,
     );
     var request = http.Request(method, url);
 
@@ -97,8 +92,8 @@ class CachedHttpClient {
       }
     }
 
-    http.Response tmpHttpResponse = 
-      await http.Response.fromStream(await send(request, retry));
+    http.Response tmpHttpResponse =
+        await http.Response.fromStream(await send(request, retry));
 
     if (tmpHttpResponse.body.isNotEmpty) {
       try {
@@ -111,13 +106,13 @@ class CachedHttpClient {
     }
 
     return Response(
-      body: body, 
-      statusCode: tmpHttpResponse.statusCode,
-      headers: tmpHttpResponse.headers
-    );
+        body: body,
+        statusCode: tmpHttpResponse.statusCode,
+        headers: tmpHttpResponse.headers);
   }
 
-  Future<http.StreamedResponse> send(http.BaseRequest request, bool retry) async {
+  Future<http.StreamedResponse> send(
+      http.BaseRequest request, bool retry) async {
     // this is needed since inside of send finalize is called on request which
     // can't be undone! Therefore we have to copy the request first which isn't
     // trivial and sometimes not even possible (for StreamedRequests e.g.)
@@ -128,7 +123,7 @@ class CachedHttpClient {
     } catch (e) {
       if (retry) {
         failedRequests.add(notFinalizedRequest);
-        
+
         // if a timer is already active reset it
         if (retryTimer != null) {
           retryTimer!.cancel();
@@ -138,7 +133,7 @@ class CachedHttpClient {
       rethrow;
     }
   }
-  
+
   void periodicRetry(Timer timer) async {
     // cancel the time since out would be reactivated if any request fails
     timer.cancel();
@@ -152,27 +147,23 @@ class CachedHttpClient {
       } catch (e) {
         // nothing we want to do here
       }
-      
     }
   }
 
   http.BaseRequest _copyRequest(http.BaseRequest request) {
     http.BaseRequest requestCopy;
 
-    if(request is http.Request) {
+    if (request is http.Request) {
       requestCopy = http.Request(request.method, request.url)
         ..encoding = request.encoding
         ..bodyBytes = request.bodyBytes;
-    }
-    else if(request is http.MultipartRequest) {
+    } else if (request is http.MultipartRequest) {
       requestCopy = http.MultipartRequest(request.method, request.url)
         ..fields.addAll(request.fields)
         ..files.addAll(request.files);
-    }
-    else if(request is http.StreamedRequest) {
+    } else if (request is http.StreamedRequest) {
       throw Exception('copying streamed requests is not supported');
-    }
-    else {
+    } else {
       throw Exception('request type is unknown, cannot copy');
     }
 
